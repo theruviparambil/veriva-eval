@@ -1,0 +1,37 @@
+{
+  "version": "sample-1",
+  "createdAt": "2026-06-27",
+  "description": "Tiny illustrative corpus of real merged public PRs for the `npm run bench` demo. Needs `gh` authenticated to fetch diffs. Regenerate a larger corpus with `npm run corpus`, or swap in your own PRs. If a PR number drifts, the bench skips it gracefully.",
+  "items": [
+    {
+      "id": "vuejs/core#14755",
+      "repo": "vuejs/core",
+      "prNumber": 14755,
+      "url": "https://github.com/vuejs/core/pull/14755",
+      "title": "Sample PR — Vue core",
+      "language": "typescript",
+      "sizeClass": "medium",
+      "category": "QUALITY"
+    },
+    {
+      "id": "vercel/vercel#16148",
+      "repo": "vercel/vercel",
+      "prNumber": 16148,
+      "url": "https://github.com/vercel/vercel/pull/16148",
+      "title": "Sample PR — Vercel",
+      "language": "typescript",
+      "sizeClass": "medium",
+      "category": "QUALITY"
+    },
+    {
+      "id": "vitejs/vite#22306",
+      "repo": "vitejs/vite",
+      "prNumber": 22306,
+      "url": "https://github.com/vitejs/vite/pull/22306",
+      "title": "Sample PR — Vite",
+      "language": "typescript",
+      "sizeClass": "medium",
+      "category": "QUALITY"
+    }
+  ]
+}

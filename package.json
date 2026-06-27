@@ -1,0 +1,33 @@
+{
+  "name": "veriva-eval",
+  "version": "0.1.0",
+  "description": "Cross-model LLM-judge eval harness with Cohen's-kappa validation. Extracted from a production AI code-governance pipeline.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "replay": "tsx src/replay.ts",
+    "eval": "tsx src/cross-eval.ts",
+    "bench": "tsx src/bench.ts",
+    "kappa": "node labeling/cohens-kappa.mjs --pass1=data/sample/labels-pass1.json --pass2=data/sample/labels-pass2.json --out=out/kappa-reconciled.json",
+    "reliability": "node labeling/rater-reliability.mjs --in=data/sample/panel-comparison.json --truth=data/sample/panel/truth.json",
+    "panel": "node scripts/build-panel-comparison.mjs",
+    "corpus": "node scripts/fetch-corpus.mjs",
+    "check-types": "tsc --noEmit",
+    "test": "vitest run",
+    "test:smoke": "tsx src/__tests__/bench-pacer.test.mts && tsx src/__tests__/qodo-parser.test.mts"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "p-limit": "^7.3.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.6.0",
+    "vitest": "^3.0.0"
+  }
+}

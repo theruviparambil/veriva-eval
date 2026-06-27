@@ -1,0 +1,8 @@
+[
+  { "sampleId": "s1", "label": "TP", "reason": "synthetic sample — pass 2" },
+  { "sampleId": "s2", "label": "FP", "reason": "synthetic sample — pass 2" },
+  { "sampleId": "s3", "label": "NEEDS_INVESTIGATION", "reason": "synthetic sample — pass 2 (changed from pass 1)" },
+  { "sampleId": "s4", "label": "NEEDS_INVESTIGATION", "reason": "synthetic sample — pass 2" },
+  { "sampleId": "s5", "label": "FP", "reason": "synthetic sample — pass 2" },
+  { "sampleId": "s6", "label": "FP", "reason": "synthetic sample — pass 2 (changed from pass 1)" }
+]
