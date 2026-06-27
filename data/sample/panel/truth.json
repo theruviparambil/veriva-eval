@@ -1,0 +1,13 @@
+{
+  "note": "SYNTHETIC sample data — hand-authored to demonstrate the tooling, not a real run. Real panels are not published.",
+  "verdicts": [
+    { "findingId": "sf-01", "label": "TP" },
+    { "findingId": "sf-02", "label": "TP" },
+    { "findingId": "sf-03", "label": "TP" },
+    { "findingId": "sf-04", "label": "TP" },
+    { "findingId": "sf-05", "label": "FP" },
+    { "findingId": "sf-06", "label": "FP" },
+    { "findingId": "sf-07", "label": "NEEDS_INVESTIGATION" },
+    { "findingId": "sf-08", "label": "TP" }
+  ]
+}

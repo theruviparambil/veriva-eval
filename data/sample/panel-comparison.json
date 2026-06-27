@@ -1,0 +1,112 @@
+{
+  "generatedFrom": "panel",
+  "raters": {
+    "model-a": {
+      "name": "model-a"
+    },
+    "model-b": {
+      "name": "model-b"
+    },
+    "model-c": {
+      "name": "model-c"
+    }
+  },
+  "pairwiseKappa": {
+    "model-a_model-b": {
+      "kappa": 0,
+      "observedAgreement": 0.25
+    },
+    "model-a_model-c": {
+      "kappa": 0,
+      "observedAgreement": 0.5
+    },
+    "model-b_model-c": {
+      "kappa": 0.2727272727272727,
+      "observedAgreement": 0.5
+    }
+  },
+  "consensus": {
+    "entries": [
+      {
+        "findingId": "sf-01",
+        "labels": {
+          "model-a": "TP",
+          "model-b": "TP",
+          "model-c": "TP"
+        },
+        "consensus": "UNANIMOUS",
+        "consensusLabel": "TP"
+      },
+      {
+        "findingId": "sf-02",
+        "labels": {
+          "model-a": "TP",
+          "model-b": "FP",
+          "model-c": "TP"
+        },
+        "consensus": "MAJORITY",
+        "consensusLabel": "TP"
+      },
+      {
+        "findingId": "sf-03",
+        "labels": {
+          "model-a": "TP",
+          "model-b": "NEEDS_INVESTIGATION",
+          "model-c": "TP"
+        },
+        "consensus": "MAJORITY",
+        "consensusLabel": "TP"
+      },
+      {
+        "findingId": "sf-04",
+        "labels": {
+          "model-a": "TP",
+          "model-b": "NEEDS_INVESTIGATION",
+          "model-c": "FP"
+        },
+        "consensus": "SPLIT",
+        "consensusLabel": null
+      },
+      {
+        "findingId": "sf-05",
+        "labels": {
+          "model-a": "TP",
+          "model-b": "FP",
+          "model-c": "FP"
+        },
+        "consensus": "MAJORITY",
+        "consensusLabel": "FP"
+      },
+      {
+        "findingId": "sf-06",
+        "labels": {
+          "model-a": "TP",
+          "model-b": "FP",
+          "model-c": "NEEDS_INVESTIGATION"
+        },
+        "consensus": "SPLIT",
+        "consensusLabel": null
+      },
+      {
+        "findingId": "sf-07",
+        "labels": {
+          "model-a": "TP",
+          "model-b": "NEEDS_INVESTIGATION",
+          "model-c": "NEEDS_INVESTIGATION"
+        },
+        "consensus": "MAJORITY",
+        "consensusLabel": "NEEDS_INVESTIGATION"
+      },
+      {
+        "findingId": "sf-08",
+        "labels": {
+          "model-a": "TP",
+          "model-b": "TP",
+          "model-c": "TP"
+        },
+        "consensus": "UNANIMOUS",
+        "consensusLabel": "TP"
+      }
+    ]
+  }
+}

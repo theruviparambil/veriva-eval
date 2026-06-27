@@ -1,0 +1,8 @@
+{"findingId":"sf-01","label":"TP","confidence":80,"reasoning":"synthetic sample label — lenient rater","model":"model-a"}
+{"findingId":"sf-02","label":"TP","confidence":75,"reasoning":"synthetic sample label — lenient rater","model":"model-a"}
+{"findingId":"sf-03","label":"TP","confidence":78,"reasoning":"synthetic sample label — lenient rater","model":"model-a"}
+{"findingId":"sf-04","label":"TP","confidence":70,"reasoning":"synthetic sample label — lenient rater","model":"model-a"}
+{"findingId":"sf-05","label":"TP","confidence":65,"reasoning":"synthetic sample label — lenient rater","model":"model-a"}
+{"findingId":"sf-06","label":"TP","confidence":60,"reasoning":"synthetic sample label — lenient rater","model":"model-a"}
+{"findingId":"sf-07","label":"TP","confidence":62,"reasoning":"synthetic sample label — lenient rater","model":"model-a"}
+{"findingId":"sf-08","label":"TP","confidence":85,"reasoning":"synthetic sample label — lenient rater","model":"model-a"}

@@ -1,0 +1,14 @@
+node_modules/
+dist/
+coverage/
+out/
+.env
+.env.local
+*.log
+.DS_Store
+
+# Private / internal-only — never published.
+# The real corpus, model labelings, adjudications, gold set, and result writeups
+# live under internal/ and stay local. The public repo ships synthetic samples.
+internal/
+*.internal.md

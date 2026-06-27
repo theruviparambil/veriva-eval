@@ -1,0 +1,8 @@
+{"findingId":"sf-01","label":"TP","confidence":90,"reasoning":"synthetic sample label — strict rater","model":"model-b"}
+{"findingId":"sf-02","label":"FP","confidence":70,"reasoning":"synthetic sample label — strict rater","model":"model-b"}
+{"findingId":"sf-03","label":"NEEDS_INVESTIGATION","confidence":55,"reasoning":"synthetic sample label — strict rater","model":"model-b"}
+{"findingId":"sf-04","label":"NEEDS_INVESTIGATION","confidence":55,"reasoning":"synthetic sample label — strict rater","model":"model-b"}
+{"findingId":"sf-05","label":"FP","confidence":80,"reasoning":"synthetic sample label — strict rater","model":"model-b"}
+{"findingId":"sf-06","label":"FP","confidence":82,"reasoning":"synthetic sample label — strict rater","model":"model-b"}
+{"findingId":"sf-07","label":"NEEDS_INVESTIGATION","confidence":60,"reasoning":"synthetic sample label — strict rater","model":"model-b"}
+{"findingId":"sf-08","label":"TP","confidence":88,"reasoning":"synthetic sample label — strict rater","model":"model-b"}
