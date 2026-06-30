@@ -1,0 +1,98 @@
+{
+  "note": "REAL adjudicated run (redacted). 7 frontier models labeled findings from merged PRs in public OSS repos (Cal.com, Discourse); truth set by a separate full-context adjudication pass. Internal finding-ids and rule tags removed.",
+  "rubric": "v3.2026-05-31",
+  "verdicts": [
+    {
+      "findingId": "f-01",
+      "label": "TP"
+    },
+    {
+      "findingId": "f-02",
+      "label": "TP"
+    },
+    {
+      "findingId": "f-03",
+      "label": "TP"
+    },
+    {
+      "findingId": "f-04",
+      "label": "TP"
+    },
+    {
+      "findingId": "f-05",
+      "label": "TP"
+    },
+    {
+      "findingId": "f-06",
+      "label": "TP"
+    },
+    {
+      "findingId": "f-07",
+      "label": "TP"
+    },
+    {
+      "findingId": "f-08",
+      "label": "TP"
+    },
+    {
+      "findingId": "f-09",
+      "label": "TP"
+    },
+    {
+      "findingId": "f-10",
+      "label": "TP"
+    },
+    {
+      "findingId": "f-11",
+      "label": "NEEDS_INVESTIGATION"
+    },
+    {
+      "findingId": "f-12",
+      "label": "NEEDS_INVESTIGATION"
+    },
+    {
+      "findingId": "f-13",
+      "label": "NEEDS_INVESTIGATION"
+    },
+    {
+      "findingId": "f-14",
+      "label": "NEEDS_INVESTIGATION"
+    },
+    {
+      "findingId": "f-15",
+      "label": "TP"
+    },
+    {
+      "findingId": "f-16",
+      "label": "TP"
+    },
+    {
+      "findingId": "f-17",
+      "label": "NEEDS_INVESTIGATION"
+    },
+    {
+      "findingId": "f-18",
+      "label": "TP"
+    },
+    {
+      "findingId": "f-19",
+      "label": "NEEDS_INVESTIGATION"
+    },
+    {
+      "findingId": "f-20",
+      "label": "TP"
+    },
+    {
+      "findingId": "f-21",
+      "label": "NEEDS_INVESTIGATION"
+    },
+    {
+      "findingId": "f-22",
+      "label": "TP"
+    },
+    {
+      "findingId": "f-23",
+      "label": "FP"
+    }
+  ]
+}

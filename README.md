@@ -5,12 +5,13 @@ validate a panel of human graders: with inter-rater agreement (Cohen's κ), not
 accuracy. Before you trust a model to grade AI-generated code, you first prove
 the grader itself is reliable.
 
-Extracted from a production AI code-governance pipeline. This repo is the
-**methodology and tooling** — the judge, the κ validation, the rubric, the
-benchmark harness. The real labeled corpus, model labelings, and run results are
-kept private; everything shipped here runs on small **synthetic** samples so you
-can see the machinery without a dataset. Self-contained, MIT, no cloud account
-required.
+Extracted from a production AI code-governance pipeline. This repo ships the
+**methodology and tooling** (the judge, the κ validation, the rubric, the
+benchmark harness) plus a **redacted real run**: seven frontier models scored
+over 23 findings from public-OSS pull requests, with `npm run replay:real`. The
+private corpus stays private, but you can reproduce the real panel's agreement
+numbers yourself, and a synthetic sample lets you see the machinery with zero
+setup. Self-contained, MIT, no cloud account required.
 
 ## Quickstart (no API key, ~30 seconds)
 
@@ -19,13 +20,14 @@ npm install
 npm run replay
 ```
 
-`replay` reads a rater panel (a `truth.json` plus one `<model>.jsonl` per model)
-and computes each model's recall and precision against the adjudicated truth,
-plus the pairwise Cohen's κ between models. The shipped panel under
-`data/sample/panel/` is **synthetic** — point it at your own export with
-`npm run replay -- --dir=path/to/panel`.
+`replay` reads a rater panel (a `truth.json` plus one `<model>.jsonl` per model),
+computes each model's recall and precision against the adjudicated truth, and
+reports panel-level agreement with **Fleiss' κ and Krippendorff's α** (the
+recognized statistics for more than two raters; averaging pairwise Cohen's κ is
+not). The default panel under `data/sample/panel/` is **synthetic**. Point it at
+your own export with `--dir=path/to/panel`.
 
-On the synthetic panel you'll see:
+On the synthetic panel you'll see per-model recall/precision, then panel agreement:
 
 ```
 rater       recall (caught real TP)   precision (TP calls correct)
@@ -33,13 +35,40 @@ model-a     100% (5/5)                63% (5/8)
 model-b     40% (2/5)                 100% (2/2)
 model-c     80% (4/5)                 100% (4/4)
 
-panel mean pairwise kappa: 0.091 (poor)
+Fleiss' kappa:        -0.018 (poor)
+Krippendorff's alpha:  0.024 (poor)
 ```
 
-That spread is the point. `model-a` catches every true positive but over-calls;
-`model-b` fires rarely but is never wrong; they genuinely disagree. A single
-judge hides that variance. A panel measured by κ exposes it — which is exactly
-what a human adjudication step then resolves.
+`model-a` catches every true positive but over-calls; `model-b` fires rarely but
+is never wrong. They genuinely disagree. A single judge hides that variance; a
+panel measured by κ exposes it, which a human adjudication step then resolves.
+
+### The real run
+
+```bash
+npm run replay:real
+```
+
+The same tooling over a **redacted real panel**: seven frontier models (Claude,
+GPT, Gemini, Grok, Qwen, DeepSeek, GLM) labeling 23 findings from merged PRs in
+public OSS repos (Cal.com, Discourse), against an independently adjudicated truth
+set. The model reasoning ships with the labels, so you can read why they split.
+
+```
+rater       recall (caught real TP)   precision (TP calls correct)
+claude      80% (12/15)               92% (12/13)
+gemini      100% (15/15)              83% (15/18)
+gpt         67% (10/15)               100% (10/10)
+grok        13% (2/15)                100% (2/2)
+...
+Fleiss' kappa:        0.135 (poor)
+Krippendorff's alpha: 0.141 (poor)
+```
+
+Real models, real disagreement. Gemini catches every true positive and
+over-calls; Grok fires twice and is never wrong. Low panel agreement is the
+finding, not a bug: independent frontier models split on hard findings, and that
+split is what the quorum and adjudication exist to resolve.
 
 ## Why κ instead of accuracy
 
@@ -101,9 +130,10 @@ See [`docs/RESULTS.md`](docs/RESULTS.md) for the full write-up.
 
 ```
 data/sample/panel/          SYNTHETIC rater panel (truth.json + <model>.jsonl)
+data/panel-real/            REDACTED REAL 7-model panel (npm run replay:real)
       │
       ├── npm run replay ──►  src/replay.ts ──► src/kappa.ts
-      │                       per-model recall/precision + pairwise Cohen's κ
+      │                       recall/precision + Fleiss' κ + Krippendorff's α
       │
 data/sample/cross-eval-cases.jsonl   synthetic judge cases
       │

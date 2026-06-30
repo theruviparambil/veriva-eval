@@ -37,7 +37,7 @@ Everything is plain files so the panel runs anywhere:
   ```
   {
     "findingId": "…",            // opaque id, echoed back in your output
-    "ruleId": "L2-SEC-002",
+    "ruleId": "SEC-002",
     "severity": "CRITICAL|HIGH|MEDIUM|LOW|INFO",
     "category": "SECURITY|QUALITY|PRACTICES|DOCUMENTATION|SUPPLY_CHAIN",
     "language": "typescript|python|go|…",
