@@ -1,9 +1,9 @@
 # veriva-eval
 
 An eval harness for LLM-as-judge systems. It validates the judge the way you'd
-validate a panel of human graders: with inter-rater agreement (Cohen's κ), not
-accuracy. Before you trust a model to grade AI-generated code, you first prove
-the grader itself is reliable.
+validate a panel of human graders: with inter-rater agreement (Fleiss' κ and
+Krippendorff's α), not accuracy. Before you trust a model to grade AI-generated
+code, you first prove the grader itself is reliable.
 
 Extracted from a production AI code-governance pipeline. This repo ships the
 **methodology and tooling** (the judge, the κ validation, the rubric, the
