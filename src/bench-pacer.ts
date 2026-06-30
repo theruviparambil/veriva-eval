@@ -44,7 +44,7 @@ interface TokenSample {
 }
 
 interface RecentResult {
-  /** Was this PR's L2 call rate-limited / circuit-open? */
+  /** Was this PR's review call rate-limited / circuit-open? */
   errored: boolean;
 }
 

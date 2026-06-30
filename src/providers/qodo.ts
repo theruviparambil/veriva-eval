@@ -38,10 +38,10 @@ import type {
 
 const execFileAsync = promisify(execFile);
 
-// Pin pr-agent to a known commit/version for reproducibility. The latest
-// pre-release tag at the time of writing the bench. Bump and re-run when
-// we want to track upstream changes.
-const PR_AGENT_VERSION = 'pr-agent';
+// pr-agent version for the bench. Defaults to the latest published package; for
+// a reproducible run, pin a specific release or git ref via the env var, e.g.
+// PR_AGENT_VERSION="pr-agent==0.30". Whatever is used is recorded in the output.
+const PR_AGENT_VERSION = process.env.PR_AGENT_VERSION?.trim() || 'pr-agent';
 
 // The model pr-agent runs, in litellm id format (e.g. "anthropic/claude-...",
 // "openai/gpt-...", "bedrock/..."). Set QODO_MODEL to match the baseline

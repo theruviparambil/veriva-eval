@@ -9,6 +9,7 @@
   },
   "scripts": {
     "replay": "tsx src/replay.ts",
+    "replay:real": "tsx src/replay.ts --dir=data/panel-real",
     "eval": "tsx src/cross-eval.ts",
     "bench": "tsx src/bench.ts",
     "kappa": "node labeling/cohens-kappa.mjs --pass1=data/sample/labels-pass1.json --pass2=data/sample/labels-pass2.json --out=out/kappa-reconciled.json",
