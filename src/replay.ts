@@ -1,8 +1,9 @@
 /**
  * Zero-key replay (`npm run replay`).
  *
- * Recomputes per-model recall/precision and pairwise Cohen's kappa for a rater
- * panel — no API keys, runs in seconds. It reads a panel directory:
+ * Recomputes per-model recall/precision and panel agreement (Fleiss' kappa and
+ * Krippendorff's alpha) for a rater panel, no API keys, in seconds. It reads a
+ * panel directory:
  *
  *   <dir>/truth.json        { "verdicts": [ { "findingId", "label" } ] }
  *   <dir>/<model>.jsonl     one {"findingId","label",...} per line, per rater

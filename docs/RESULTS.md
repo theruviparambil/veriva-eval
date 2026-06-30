@@ -1,17 +1,20 @@
 # Results — validating an LLM judge
 
-This repo ships the methodology and tooling, not the data. The real labeled
-corpus, model labelings, and run results are kept private. Everything here runs
-on a small **synthetic** sample panel so you can see the machinery.
+This repo ships the methodology and tooling plus a redacted real run. The full
+private corpus stays private, but two panels are included: a synthetic sample
+(`npm run replay`, the zero-key default) and a **redacted real panel** of seven
+frontier models over 23 findings from public-OSS PRs (`npm run replay:real`).
 
 ```
-npm run replay
+npm run replay        # synthetic sample
+npm run replay:real   # redacted real 7-model panel
 ```
 
 `replay` reads a rater panel (a `truth.json` plus one `<model>.jsonl` per model)
 and computes, for each model, its recall and precision against the adjudicated
-truth, plus the pairwise Cohen's κ between models. Point it at your own export
-with `npm run replay -- --dir=path/to/panel`.
+truth, then panel-level agreement with **Fleiss' κ and Krippendorff's α** (the
+recognized statistics for more than two raters). Point it at your own export with
+`--dir=path/to/panel`.
 
 ## What it shows
 
@@ -21,11 +24,12 @@ The models disagree, and the disagreement is the signal:
   precision). Others fire rarely but are almost always right (low recall, high
   precision). On the synthetic sample one rater labels everything a true positive
   and lands at κ ≈ 0 — the rubber-stamp failure mode, made visible.
-- Pairwise κ across a panel of independent frontier models tends to be *low* —
-  often "poor" to "fair" on the standard scale. That isn't a flaw. They genuinely
-  split on hard findings. A single judge hides that variance behind one confident
-  answer; a panel measured by κ surfaces it, which is exactly what the human
-  adjudication step then resolves.
+- Panel agreement (Fleiss' κ and Krippendorff's α) across independent frontier
+  models tends to be *low*, often "poor" to "fair" on the standard scale. That
+  isn't a flaw. They genuinely split on hard findings. A single judge hides that
+  variance behind one confident answer; a panel measured by these coefficients
+  surfaces it, which is what the human adjudication step then resolves. (Pairwise
+  Cohen's κ is also reported, but only as a per-rater redundancy view.)
 
 This is the core lesson: **you validate an LLM judge the way you validate human
 raters, with chance-corrected agreement, not accuracy.** On an imbalanced label
