@@ -1,0 +1,438 @@
+{
+  "generatedFrom": "panel-real",
+  "raters": {
+    "claude": {
+      "name": "claude"
+    },
+    "deepseek": {
+      "name": "deepseek"
+    },
+    "gemini": {
+      "name": "gemini"
+    },
+    "glm": {
+      "name": "glm"
+    },
+    "gpt": {
+      "name": "gpt"
+    },
+    "grok": {
+      "name": "grok"
+    },
+    "qwen": {
+      "name": "qwen"
+    }
+  },
+  "pairwiseKappa": {
+    "claude_deepseek": {
+      "kappa": 0.3162162162162162,
+      "observedAgreement": 0.5217391304347826
+    },
+    "claude_gemini": {
+      "kappa": 0.368627450980392,
+      "observedAgreement": 0.6956521739130435
+    },
+    "claude_glm": {
+      "kappa": 0.22033898305084754,
+      "observedAgreement": 0.6521739130434783
+    },
+    "claude_gpt": {
+      "kappa": 0.4229390681003584,
+      "observedAgreement": 0.6956521739130435
+    },
+    "claude_grok": {
+      "kappa": 0.16501650165016504,
+      "observedAgreement": 0.5217391304347826
+    },
+    "claude_qwen": {
+      "kappa": 0.04958677685950412,
+      "observedAgreement": 0.34782608695652173
+    },
+    "deepseek_gemini": {
+      "kappa": 0.1766109785202864,
+      "observedAgreement": 0.34782608695652173
+    },
+    "deepseek_glm": {
+      "kappa": 0.06334841628959277,
+      "observedAgreement": 0.21739130434782608
+    },
+    "deepseek_gpt": {
+      "kappa": 0.3371757925072046,
+      "observedAgreement": 0.5652173913043478
+    },
+    "deepseek_grok": {
+      "kappa": 0.16363636363636358,
+      "observedAgreement": 0.5652173913043478
+    },
+    "deepseek_qwen": {
+      "kappa": 0.19700748129675816,
+      "observedAgreement": 0.391304347826087
+    },
+    "gemini_glm": {
+      "kappa": 0.5174825174825174,
+      "observedAgreement": 0.8695652173913043
+    },
+    "gemini_gpt": {
+      "kappa": 0.38666666666666666,
+      "observedAgreement": 0.6521739130434783
+    },
+    "gemini_grok": {
+      "kappa": 0.10679611650485439,
+      "observedAgreement": 0.30434782608695654
+    },
+    "gemini_qwen": {
+      "kappa": 0.15384615384615374,
+      "observedAgreement": 0.5217391304347826
+    },
+    "glm_gpt": {
+      "kappa": 0.14237288135593226,
+      "observedAgreement": 0.5217391304347826
+    },
+    "glm_grok": {
+      "kappa": 0.022371364653243863,
+      "observedAgreement": 0.17391304347826086
+    },
+    "glm_qwen": {
+      "kappa": -0.08727272727272713,
+      "observedAgreement": 0.43478260869565216
+    },
+    "gpt_grok": {
+      "kappa": 0.3134328358208956,
+      "observedAgreement": 0.6521739130434783
+    },
+    "gpt_qwen": {
+      "kappa": 0.10852713178294571,
+      "observedAgreement": 0.34782608695652173
+    },
+    "grok_qwen": {
+      "kappa": 0.03157894736842105,
+      "observedAgreement": 0.13043478260869565
+    }
+  },
+  "consensus": {
+    "entries": [
+      {
+        "findingId": "f-01",
+        "labels": {
+          "claude": "NEEDS_INVESTIGATION",
+          "deepseek": "NEEDS_INVESTIGATION",
+          "gemini": "TP",
+          "glm": "TP",
+          "gpt": "TP",
+          "grok": "NEEDS_INVESTIGATION",
+          "qwen": "FP"
+        },
+        "consensus": "SPLIT",
+        "consensusLabel": null
+      },
+      {
+        "findingId": "f-02",
+        "labels": {
+          "claude": "TP",
+          "deepseek": "FP",
+          "gemini": "TP",
+          "glm": "TP",
+          "gpt": "NEEDS_INVESTIGATION",
+          "grok": "NEEDS_INVESTIGATION",
+          "qwen": "TP"
+        },
+        "consensus": "MAJORITY",
+        "consensusLabel": "TP"
+      },
+      {
+        "findingId": "f-03",
+        "labels": {
+          "claude": "TP",
+          "deepseek": "NEEDS_INVESTIGATION",
+          "gemini": "TP",
+          "glm": "TP",
+          "gpt": "TP",
+          "grok": "NEEDS_INVESTIGATION",
+          "qwen": "TP"
+        },
+        "consensus": "MAJORITY",
+        "consensusLabel": "TP"
+      },
+      {
+        "findingId": "f-04",
+        "labels": {
+          "claude": "NEEDS_INVESTIGATION",
+          "deepseek": "FP",
+          "gemini": "TP",
+          "glm": "TP",
+          "gpt": "TP",
+          "grok": "NEEDS_INVESTIGATION",
+          "qwen": "TP"
+        },
+        "consensus": "MAJORITY",
+        "consensusLabel": "TP"
+      },
+      {
+        "findingId": "f-05",
+        "labels": {
+          "claude": "TP",
+          "deepseek": "FP",
+          "gemini": "TP",
+          "glm": "TP",
+          "gpt": "TP",
+          "grok": "NEEDS_INVESTIGATION",
+          "qwen": "FP"
+        },
+        "consensus": "MAJORITY",
+        "consensusLabel": "TP"
+      },
+      {
+        "findingId": "f-06",
+        "labels": {
+          "claude": "TP",
+          "deepseek": "FP",
+          "gemini": "TP",
+          "glm": "TP",
+          "gpt": "TP",
+          "grok": "NEEDS_INVESTIGATION",
+          "qwen": "TP"
+        },
+        "consensus": "MAJORITY",
+        "consensusLabel": "TP"
+      },
+      {
+        "findingId": "f-07",
+        "labels": {
+          "claude": "TP",
+          "deepseek": "NEEDS_INVESTIGATION",
+          "gemini": "TP",
+          "glm": "TP",
+          "gpt": "TP",
+          "grok": "TP",
+          "qwen": "FP"
+        },
+        "consensus": "MAJORITY",
+        "consensusLabel": "TP"
+      },
+      {
+        "findingId": "f-08",
+        "labels": {
+          "claude": "TP",
+          "deepseek": "FP",
+          "gemini": "TP",
+          "glm": "TP",
+          "gpt": "NEEDS_INVESTIGATION",
+          "grok": "NEEDS_INVESTIGATION",
+          "qwen": "FP"
+        },
+        "consensus": "SPLIT",
+        "consensusLabel": null
+      },
+      {
+        "findingId": "f-09",
+        "labels": {
+          "claude": "TP",
+          "deepseek": "FP",
+          "gemini": "TP",
+          "glm": "TP",
+          "gpt": "TP",
+          "grok": "NEEDS_INVESTIGATION",
+          "qwen": "FP"
+        },
+        "consensus": "MAJORITY",
+        "consensusLabel": "TP"
+      },
+      {
+        "findingId": "f-10",
+        "labels": {
+          "claude": "NEEDS_INVESTIGATION",
+          "deepseek": "NEEDS_INVESTIGATION",
+          "gemini": "TP",
+          "glm": "TP",
+          "gpt": "NEEDS_INVESTIGATION",
+          "grok": "NEEDS_INVESTIGATION",
+          "qwen": "TP"
+        },
+        "consensus": "MAJORITY",
+        "consensusLabel": "NEEDS_INVESTIGATION"
+      },
+      {
+        "findingId": "f-11",
+        "labels": {
+          "claude": "NEEDS_INVESTIGATION",
+          "deepseek": "NEEDS_INVESTIGATION",
+          "gemini": "TP",
+          "glm": "TP",
+          "gpt": "NEEDS_INVESTIGATION",
+          "grok": "NEEDS_INVESTIGATION",
+          "qwen": "FP"
+        },
+        "consensus": "MAJORITY",
+        "consensusLabel": "NEEDS_INVESTIGATION"
+      },
+      {
+        "findingId": "f-12",
+        "labels": {
+          "claude": "NEEDS_INVESTIGATION",
+          "deepseek": "NEEDS_INVESTIGATION",
+          "gemini": "TP",
+          "glm": "TP",
+          "gpt": "NEEDS_INVESTIGATION",
+          "grok": "NEEDS_INVESTIGATION",
+          "qwen": "FP"
+        },
+        "consensus": "MAJORITY",
+        "consensusLabel": "NEEDS_INVESTIGATION"
+      },
+      {
+        "findingId": "f-13",
+        "labels": {
+          "claude": "NEEDS_INVESTIGATION",
+          "deepseek": "NEEDS_INVESTIGATION",
+          "gemini": "TP",
+          "glm": "TP",
+          "gpt": "NEEDS_INVESTIGATION",
+          "grok": "NEEDS_INVESTIGATION",
+          "qwen": "TP"
+        },
+        "consensus": "MAJORITY",
+        "consensusLabel": "NEEDS_INVESTIGATION"
+      },
+      {
+        "findingId": "f-14",
+        "labels": {
+          "claude": "NEEDS_INVESTIGATION",
+          "deepseek": "NEEDS_INVESTIGATION",
+          "gemini": "NEEDS_INVESTIGATION",
+          "glm": "TP",
+          "gpt": "NEEDS_INVESTIGATION",
+          "grok": "NEEDS_INVESTIGATION",
+          "qwen": "NEEDS_INVESTIGATION"
+        },
+        "consensus": "MAJORITY",
+        "consensusLabel": "NEEDS_INVESTIGATION"
+      },
+      {
+        "findingId": "f-15",
+        "labels": {
+          "claude": "TP",
+          "deepseek": "TP",
+          "gemini": "TP",
+          "glm": "TP",
+          "gpt": "TP",
+          "grok": "NEEDS_INVESTIGATION",
+          "qwen": "TP"
+        },
+        "consensus": "MAJORITY",
+        "consensusLabel": "TP"
+      },
+      {
+        "findingId": "f-16",
+        "labels": {
+          "claude": "TP",
+          "deepseek": "TP",
+          "gemini": "TP",
+          "glm": "TP",
+          "gpt": "TP",
+          "grok": "NEEDS_INVESTIGATION",
+          "qwen": "TP"
+        },
+        "consensus": "MAJORITY",
+        "consensusLabel": "TP"
+      },
+      {
+        "findingId": "f-17",
+        "labels": {
+          "claude": "NEEDS_INVESTIGATION",
+          "deepseek": "NEEDS_INVESTIGATION",
+          "gemini": "NEEDS_INVESTIGATION",
+          "glm": "NEEDS_INVESTIGATION",
+          "gpt": "NEEDS_INVESTIGATION",
+          "grok": "NEEDS_INVESTIGATION",
+          "qwen": "TP"
+        },
+        "consensus": "MAJORITY",
+        "consensusLabel": "NEEDS_INVESTIGATION"
+      },
+      {
+        "findingId": "f-18",
+        "labels": {
+          "claude": "TP",
+          "deepseek": "NEEDS_INVESTIGATION",
+          "gemini": "TP",
+          "glm": "TP",
+          "gpt": "NEEDS_INVESTIGATION",
+          "grok": "NEEDS_INVESTIGATION",
+          "qwen": "TP"
+        },
+        "consensus": "MAJORITY",
+        "consensusLabel": "TP"
+      },
+      {
+        "findingId": "f-19",
+        "labels": {
+          "claude": "NEEDS_INVESTIGATION",
+          "deepseek": "NEEDS_INVESTIGATION",
+          "gemini": "NEEDS_INVESTIGATION",
+          "glm": "NEEDS_INVESTIGATION",
+          "gpt": "NEEDS_INVESTIGATION",
+          "grok": "NEEDS_INVESTIGATION",
+          "qwen": "TP"
+        },
+        "consensus": "MAJORITY",
+        "consensusLabel": "NEEDS_INVESTIGATION"
+      },
+      {
+        "findingId": "f-20",
+        "labels": {
+          "claude": "TP",
+          "deepseek": "FP",
+          "gemini": "TP",
+          "glm": "TP",
+          "gpt": "NEEDS_INVESTIGATION",
+          "grok": "NEEDS_INVESTIGATION",
+          "qwen": "FP"
+        },
+        "consensus": "SPLIT",
+        "consensusLabel": null
+      },
+      {
+        "findingId": "f-21",
+        "labels": {
+          "claude": "NEEDS_INVESTIGATION",
+          "deepseek": "NEEDS_INVESTIGATION",
+          "gemini": "NEEDS_INVESTIGATION",
+          "glm": "TP",
+          "gpt": "NEEDS_INVESTIGATION",
+          "grok": "NEEDS_INVESTIGATION",
+          "qwen": "FP"
+        },
+        "consensus": "MAJORITY",
+        "consensusLabel": "NEEDS_INVESTIGATION"
+      },
+      {
+        "findingId": "f-22",
+        "labels": {
+          "claude": "TP",
+          "deepseek": "TP",
+          "gemini": "TP",
+          "glm": "TP",
+          "gpt": "TP",
+          "grok": "TP",
+          "qwen": "TP"
+        },
+        "consensus": "UNANIMOUS",
+        "consensusLabel": "TP"
+      },
+      {
+        "findingId": "f-23",
+        "labels": {
+          "claude": "TP",
+          "deepseek": "FP",
+          "gemini": "FP",
+          "glm": "TP",
+          "gpt": "FP",
+          "grok": "FP",
+          "qwen": "FP"
+        },
+        "consensus": "MAJORITY",
+        "consensusLabel": "FP"
+      }
+    ]
+  }
+}

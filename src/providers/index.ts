@@ -65,10 +65,3 @@ export interface Provider {
   enabled: boolean;
   run(input: ProviderInput): Promise<ProviderResult>;
 }
-
-export class NotImplementedError extends Error {
-  constructor(providerId: string, message: string) {
-    super(`[${providerId}] not implemented: ${message}`);
-    this.name = 'NotImplementedError';
-  }
-}

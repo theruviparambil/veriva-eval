@@ -104,12 +104,14 @@ Or set native keys and the judge uses whatever's present, skipping the rest.
 PROVIDERS_ENABLED=baseline,qodo npm run bench
 ```
 
-Runs each review tool over the same PR corpus and writes a normalized,
-head-to-head comparison (findings, cost, latency). `baseline` is one direct LLM
-call; `qodo` shells out to [pr-agent](https://github.com/qodo-ai/pr-agent). Hold
-the base model constant across both and the only variable left is the
-orchestration framework, which is the question the benchmark answers. Add your
-own tool by implementing the `Provider` interface in `src/providers/`.
+This is the harness, not a shipped result — it needs your `gh` login and API
+keys, and writes the comparison to `out/` when you run it. Each tool runs over
+the same PR corpus and reports findings, cost, and latency in one normalized
+shape. `baseline` is one direct LLM call; `qodo` shells out to
+[pr-agent](https://github.com/qodo-ai/pr-agent). Hold the base model constant
+across both and the only variable left is the orchestration framework, which is
+what the benchmark isolates. Add your own tool by implementing the `Provider`
+interface in `src/providers/`.
 
 ## The result worth talking about
 
@@ -141,12 +143,13 @@ data/sample/cross-eval-cases.jsonl   synthetic judge cases
                               quorum-aggregated verdict + CI gate    (fetch, any vendor)
 
 labeling/   RUBRIC.md (judge contract + calibration anchors)
-            cohens-kappa.mjs · rater-reliability.mjs (κ + panel-reliability tools)
+            cohens-kappa.mts (two-pass Cohen's κ) · rater-reliability.mts
+            (panel Fleiss' κ / Krippendorff's α + per-rater KEEP/DROP)
             RATER_HANDOFF.md · rater-prompts/ (run a blind, multi-vendor panel)
 
 src/bench.ts + src/providers/   multi-tool head-to-head over a PR corpus
 scripts/    fetch-corpus.mjs · fetch-multilang-corpus.mjs · fetch-ground-truth.mjs
-            build-panel-comparison.mjs (panel dir → reliability input)
+            build-panel-comparison.mts (panel dir → reliability input)
 docs/       RESULTS.md (methodology) · corpus-criteria.md
 ```
 
@@ -158,12 +161,13 @@ The methodology, not just the math:
   protocol (verify, don't confirm) plus worked calibration anchors mined from
   the cases where strong models split. This is what makes κ measure rubric
   clarity instead of prompt drift.
-- **`cohens-kappa.mjs`** — reconciles two label passes into a confusion matrix
-  and κ. `npm run kappa` runs it on the synthetic sample passes.
-- **`rater-reliability.mjs`** — per-rater report: abstention, label skew,
-  redundant pairs (κ ≥ 0.85 means you're paying twice for one signal), and a
-  KEEP / DOWN-WEIGHT / DROP call per model. `npm run reliability` runs it on the
-  synthetic panel.
+- **`cohens-kappa.mts`** — reconciles two label passes into a confusion matrix
+  and Cohen's κ (the right statistic for two passes). `npm run kappa`.
+- **`rater-reliability.mts`** — per-rater report headed by the panel-level
+  **Fleiss' κ / Krippendorff's α**, then abstention, label skew, redundant pairs
+  (high *pairwise* κ = paying twice for one signal), and a KEEP / DOWN-WEIGHT /
+  DROP call per model. `npm run reliability` (synthetic) or `npm run
+  reliability:real` (the real 7-model panel). All three share `src/kappa.ts`.
 - **`RATER_HANDOFF.md` + `rater-prompts/`** — how to run a blind, cross-vendor
   panel through a plain file contract (read `findings.jsonl`, write
   `verdicts-<key>.jsonl`, compare).

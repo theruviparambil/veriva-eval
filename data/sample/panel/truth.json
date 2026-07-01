@@ -1,5 +1,5 @@
 {
-  "note": "SYNTHETIC sample data — hand-authored to demonstrate the tooling, not a real run. Real panels are not published.",
+  "note": "SYNTHETIC sample data — hand-authored to demonstrate the tooling with zero setup, not a real run. For a real run, see data/panel-real/ (npm run replay:real).",
   "verdicts": [
     { "findingId": "sf-01", "label": "TP" },
     { "findingId": "sf-02", "label": "TP" },

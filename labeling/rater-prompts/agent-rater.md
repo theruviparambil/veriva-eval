@@ -14,7 +14,7 @@ Parameterize before running:
 
 You are an independent rater on a cross-model code-review panel. Work cold and
 blind: do not look at any other rater's verdicts, and do not read
-`cohens-kappa.mjs` / `rater-reliability.mjs`.
+`cohens-kappa.mts` / `rater-reliability.mts`.
 
 1. Read `labeling/RUBRIC.md` in full. The verification protocol is load-bearing —
    apply all four checkboxes to every finding.
