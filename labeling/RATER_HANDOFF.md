@@ -13,21 +13,22 @@ You — the model reading this — are one rater on the panel. Your identity
 you were started with. Each rater writes under a unique `(model,
 rubricVersion)` tuple so the comparison keeps them cleanly separated.
 
-The reference panel was seven models across six vendors:
+The reference panel is seven models across seven vendors — the same families
+shipped in `data/panel-real/`:
 
-| Key | Model                         | Vendor    | Driver        |
-| --- | ----------------------------- | --------- | ------------- |
-| A   | Claude Sonnet (+ thinking)    | Anthropic | agent         |
-| B   | Claude Opus (+ thinking)      | Anthropic | agent         |
-| C   | GPT-5.5 (max effort)          | OpenAI    | agent         |
-| D   | qwen3-coder-480b              | Alibaba   | Ollama driver |
-| E   | deepseek-v3.1-671b            | DeepSeek  | Ollama driver |
-| F   | glm-4.6                       | Zhipu     | Ollama driver |
-| G   | Gemini                        | Google    | agent         |
+| Rater    | Vendor    |
+| -------- | --------- |
+| claude   | Anthropic |
+| gpt      | OpenAI    |
+| gemini   | Google    |
+| grok     | xAI       |
+| qwen     | Alibaba   |
+| deepseek | DeepSeek  |
+| glm      | Zhipu     |
 
-Cross-family is the point: same-family raters share blind spots and
-inflate agreement. The panel mixes vendors so κ measures rubric clarity,
-not shared training.
+Cross-family is the point: same-family raters share blind spots and inflate
+agreement. The panel mixes vendors so κ measures rubric clarity, not shared
+training.
 
 ## The file contract (no database, no network)
 
@@ -61,7 +62,7 @@ Everything is plain files so the panel runs anywhere:
 The whole value of an extra rater is an *independent* signal. So:
 
 - Do **not** read any other rater's `verdicts-*.jsonl`.
-- Do **not** read `cohens-kappa.mjs` / `rater-reliability.mjs` "to check
+- Do **not** read `cohens-kappa.mts` / `rater-reliability.mts` "to check
   your work" — that's a side channel to the other raters' labels.
 - Do **not** try to predict what another model would say and match it.
 

@@ -1,29 +1,28 @@
 # Code-review judge rubric — v3.1
 
+> This rubric evolved across three revisions, each closing a failure mode that
+> surfaced when independent frontier models labelled the same findings and
+> disagreed. The history stays because the *reasons* are the load-bearing part.
+>
 > **Version 3.1** — adds Critical principle 6 (the in-snippet guard establishes
-> the precondition → TP) after a gold-review found the strict-NI rule was
-> over-NI-ing crash-class defects where the code guards for a null/empty case
-> (`x ?? []`) then dereferences it unguarded. Principle 6 sharpens what
-> "unconfirmable" means: the *possibility* of the bad input, not the specific
-> caller. See the "guards-then-derefs-unguarded" calibration anchor.
+> the precondition → TP) after the strict-NI rule was found to over-NI crash-class
+> defects where the code guards for a null/empty case (`x ?? []`) then dereferences
+> it unguarded. Principle 6 sharpens what "unconfirmable" means: the *possibility*
+> of the bad input, not the specific caller. See the
+> "guards-then-derefs-unguarded" calibration anchor.
 >
-> **Version 3** — adds an explicit **TP-threshold rule** (Critical
-> principle 5) and a set of worked **calibration examples** after a
-> seven-rater κ panel (Sonnet 4.6, Opus 4.6, GPT-5.5, qwen3-coder-480b,
-> deepseek-v3.1-671b, glm-4.6, Gemini) produced a worst-pair κ of 0.115.
-> The disagreement was systematic, not random: raters split on *where
-> the TP line sits*. Some confirmed the description and over-called TP;
-> others reflexively FP/NI; and several confidently labelled real
-> defects FP via reasoning errors (e.g. misreading Python `or`
-> short-circuiting). Principles alone didn't pin the threshold — the
-> worked examples below do. Match the *reasoning*, not the keywords.
+> **Version 3** — adds an explicit **TP-threshold rule** (Critical principle 5)
+> and a set of worked **calibration examples** after a multi-model panel showed
+> *systematic* (not random) disagreement: raters split on *where the TP line
+> sits*. Some confirmed the description and over-called TP; others reflexively
+> FP/NI; and several confidently labelled real defects FP via reasoning errors
+> (e.g. misreading Python `or` short-circuiting). Principles alone didn't pin the
+> threshold — the worked examples below do. Match the *reasoning*, not the keywords.
 >
-> **Version 2** — tightened on 2026-05-09 after a three-rater κ run
-> (Sonnet 4.6, Opus 4.6, GPT 5.5) on 401 findings revealed a
-> **description-anchoring failure mode**: raters confirming the
-> description's claim from cited code instead of verifying it against
-> context. The "verification protocol" and test-code rules below
-> address that directly.
+> **Version 2** — tightened after a κ run revealed a **description-anchoring
+> failure mode**: raters confirming the description's claim from the cited code
+> instead of verifying it against context. The "verification protocol" and
+> test-code rules below address that directly.
 
 ## Goal
 
