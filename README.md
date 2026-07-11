@@ -13,7 +13,7 @@ private corpus stays private, but you can reproduce the real panel's agreement
 numbers yourself, and a synthetic sample lets you see the machinery with zero
 setup. Self-contained, MIT, no cloud account required.
 
-## Quickstart (no API key, ~30 seconds)
+## Quickstart (no key needed)
 
 ```bash
 npm install
