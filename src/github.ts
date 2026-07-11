@@ -1,6 +1,6 @@
 /**
  * Diff fetching via the `gh` CLI. Uses gh because it transparently handles
- * authentication from the user's existing login — no extra token management
+ * authentication from the user's existing login, no extra token management
  * for the harness.
  *
  * `gh pr diff` returns the full unified diff (same shape the GitHub App
@@ -42,7 +42,7 @@ export async function fetchPrDiff(
     const { stdout } = await execFileAsync(
       "gh",
       ["pr", "diff", String(prNumber), "--repo", repo],
-      { maxBuffer: 50 * 1024 * 1024 }, // 50MB — large diffs sometimes happen
+      { maxBuffer: 50 * 1024 * 1024 }, // 50MB: large diffs sometimes happen
     );
     diffCache.set(key, stdout);
     return stdout;
@@ -59,7 +59,7 @@ export async function fetchPrDiff(
 
 /**
  * Fetch the head SHA of a PR. We need the SHA to read file contents at the
- * exact version under review — fetching off `main` would give us the wrong
+ * exact version under review. Fetching off `main` would give us the wrong
  * content for older PRs that have since diverged from upstream.
  */
 const headShaCache = new Map<string, string>();
@@ -127,7 +127,7 @@ export async function fetchPrFileContents(
         const decoded = Buffer.from(b64, "base64").toString("utf-8");
         out.set(path, decoded.slice(0, FILE_CONTENT_CAP));
       } catch {
-        // Skip — file may have been deleted in the PR, be a binary, or have
+        // Skip: file may have been deleted in the PR, be a binary, or have
         // an encoding gh can't unwrap. Not actionable per-file in the
         // harness.
       }

@@ -1,24 +1,24 @@
 /**
- * Bench-loop pacing — three coordinated mechanisms that prevent the
+ * Bench-loop pacing: three coordinated mechanisms that prevent the
  * provider-side TPM (tokens-per-minute) exhaustion pattern that drops PRs in a
  * large bench run when a per-account token budget gets drained by consecutive
  * large diffs (often clustered in one repo).
  *
  * The mechanisms are layered:
  *
- *   1. **Sliding-window TPM tracker** — records every PR's token usage.
+ *   1. **Sliding-window TPM tracker**: records every PR's token usage.
  *      Before each new call, computes total tokens consumed in the last
  *      60s; if approaching the budget (TPM_BUDGET, default 80K), sleeps
- *      until the window has enough headroom. Predictive — prevents 429s
+ *      until the window has enough headroom. Predictive: prevents 429s
  *      before they happen instead of reacting after.
  *
- *   2. **Adaptive throttle** — base inter-PR throttle widens automatically
+ *   2. **Adaptive throttle**: base inter-PR throttle widens automatically
  *      when recent failure rate climbs. Looks at the last 10 PRs; if any
  *      errored on rate-limit / circuit-open, the throttle is held at 4×
  *      base (default 5s → 20s) for the next 5 minutes, then gradually
  *      relaxed back. Reactive backstop for whatever the TPM tracker missed.
  *
- *   3. **Inter-repo cool-down** — when the loop transitions from one repo
+ *   3. **Inter-repo cool-down**: when the loop transitions from one repo
  *      to a different repo, sleeps an extra `interRepoCooldownMs` (default
  *      60s). Catches the "one repo with N consecutive big diffs blew the
  *      bucket, next repo's diffs land before recovery" pattern.
@@ -26,7 +26,7 @@
  * The defaults assume a frontier model at roughly ~80K TPM account-wide with no
  * provisioned throughput. Tighten via env if you have less.
  *
- * All three are pure logic (no I/O beyond setTimeout) — easy to unit-test.
+ * All three are pure logic (no I/O beyond setTimeout), easy to unit-test.
  */
 
 const DEFAULT_TPM_BUDGET = 80_000;

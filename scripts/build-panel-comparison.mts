@@ -3,7 +3,7 @@
  * Build a panel-comparison.json (the aggregated input rater-reliability consumes)
  * from a panel directory: a truth.json plus one <model>.jsonl per rater. Computes
  * per-finding consensus and pairwise Cohen's kappa (the latter is used only as a
- * rater-redundancy signal — the panel-level agreement statistic is Fleiss' kappa /
+ * rater-redundancy signal. The panel-level agreement statistic is Fleiss' kappa /
  * Krippendorff's alpha, computed by rater-reliability and by `npm run replay`).
  *
  * The kappa math is the one shared, unit-tested implementation in src/kappa.ts.
@@ -50,7 +50,7 @@ for (const k of raterKeys) labels[k] = loadLabels(resolve(dir, `${k}.jsonl`));
 const raters: Record<string, { name: string }> = {};
 for (const k of raterKeys) raters[k] = { name: k };
 
-// Pairwise kappa (redundancy signal). Rater keys must not contain '_' — the
+// Pairwise kappa (redundancy signal). Rater keys must not contain '_': the
 // reliability tool splits the pair key on it.
 const pairwiseKappa: Record<string, { kappa: number; observedAgreement: number }> = {};
 for (let i = 0; i < raterKeys.length; i += 1) {

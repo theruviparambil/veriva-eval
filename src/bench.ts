@@ -6,7 +6,7 @@
  * same ProviderFinding shape, so tools are compared on equal footing.
  *
  * Hold the base model constant across providers (BASELINE_MODEL_KEY / QODO_MODEL)
- * and the only variable left is the orchestration framework — which is the
+ * and the only variable left is the orchestration framework, which is the
  * question the benchmark exists to answer.
  *
  * Requirements: `gh` authenticated (to fetch PR diffs). Providers need their own
@@ -18,9 +18,9 @@
  *   npm run bench -- path/to/corpus.json --concurrency=2 --ground-truth=gt.json
  *
  * Output (out/<timestamp>/bench/):
- *   findings.csv        — one row per (pr, provider, finding)
- *   provider-stats.csv  — one row per (pr, provider) with cost / latency / count
- *   summary.json        — per-provider aggregate (+ ground-truth buckets if given)
+ *   findings.csv        : one row per (pr, provider, finding)
+ *   provider-stats.csv  : one row per (pr, provider) with cost / latency / count
+ *   summary.json        : per-provider aggregate (+ ground-truth buckets if given)
  */
 import { config as dotenvConfig } from "dotenv";
 import { fileURLToPath } from "node:url";
@@ -115,7 +115,7 @@ async function main(): Promise<void> {
   console.log(`[bench] providers:   ${providers.map((p) => p.id).join(", ")}`);
   if (args.groundTruthPath) console.log(`[bench] ground-truth: ${args.groundTruthPath}`);
 
-  // Fail fast if any enabled provider is a stub — a missing column should be
+  // Fail fast if any enabled provider is a stub: a missing column should be
   // an explicit choice, not a silent gap.
   const stubs = providers.filter((p) => !p.enabled);
   if (stubs.length > 0) {
@@ -142,7 +142,7 @@ async function main(): Promise<void> {
       limit(async () => {
         const sleptMs = await pacer.beforePr(item.repo, idx);
         const tag = `[${idx + 1}/${corpus.items.length}] ${item.id}`;
-        if (sleptMs > 0) console.log(`${tag} paced (slept ${sleptMs}ms${pacer.isPunishing() ? " — adaptive throttle on" : ""})`);
+        if (sleptMs > 0) console.log(`${tag} paced (slept ${sleptMs}ms${pacer.isPunishing() ? ", adaptive throttle on" : ""})`);
 
         let diffText: string;
         try {
@@ -208,7 +208,7 @@ async function main(): Promise<void> {
   await writeCsv(resolve(args.outDir, "provider-stats.csv"), STAT_HEADERS, statRows as unknown as Record<string, unknown>[]);
 
   // Per-provider aggregate. With ground truth, also count findings raised on PRs
-  // that carry any ground-truth signal vs those that don't — a coarse "did the
+  // that carry any ground-truth signal vs those that don't, a coarse "did the
   // tool flag the suspicious PRs at all" signal, not a true TP rate (which needs
   // file/line correlation handled in triage).
   type Agg = { findings: number; cost: number; latency: number; erroredRuns: number; totalRuns: number; onSignaled: number; onUnsignaled: number };

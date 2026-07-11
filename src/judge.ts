@@ -7,8 +7,8 @@
  * rule (by default: pass when >= 2 of 3 models score >= 0.8).
  *
  * Why a panel instead of one judge: any single model has blind spots and
- * leans toward outputs that resemble its own. A quorum of independent models —
- * ideally from different families — is far harder to fool and mitigates the
+ * leans toward outputs that resemble its own. A quorum of independent models
+ * (ideally from different families) is far harder to fool and mitigates the
  * self-enhancement bias an LLM judge shows toward its own kind.
  *
  * A model that times out or returns junk surfaces as a Judgement with
@@ -22,7 +22,7 @@ const DEFAULT_MAX_TOKENS = 600;
 
 const JUDGE_SYSTEM_PROMPT = `You are an impartial evaluator. Score the OUTPUT against the CRITERIA on a 0.0–1.0 scale.
 
-Return strict JSON with this exact shape and nothing else — no preamble, no markdown fence, no trailing text:
+Return strict JSON with this exact shape and nothing else. No preamble, no markdown fence, no trailing text:
 
 {
   "score": <number between 0.0 and 1.0 inclusive>,
@@ -31,7 +31,7 @@ Return strict JSON with this exact shape and nothing else — no preamble, no ma
 }
 
 Rules:
-- 0.0 means the output completely fails the criteria. 1.0 means it meets them flawlessly. Use the full range — don't bunch around 0.7-0.8 unless that's honestly where things land.
+- 0.0 means the output completely fails the criteria. 1.0 means it meets them flawlessly. Use the full range: don't bunch around 0.7-0.8 unless that's honestly where things land.
 - Be specific in rationale. Generic "looks good" is not a useful rating.
 - "confidence" reflects your certainty in the score, not the quality of the output.
 - If the input/output is malformed or impossible to score, return score 0.0 and explain in rationale.`;
@@ -79,7 +79,7 @@ export async function judgeOutput(
   const panel = options.panel ?? resolvePanel();
   if (panel.length === 0) {
     throw new Error(
-      "no judge models available — set OPENROUTER_API_KEY, or ANTHROPIC_API_KEY / OPENAI_API_KEY / GOOGLE_API_KEY (see .env.example)",
+      "no judge models available: set OPENROUTER_API_KEY, or ANTHROPIC_API_KEY / OPENAI_API_KEY / GOOGLE_API_KEY (see .env.example)",
     );
   }
   const perModelTimeoutMs = options.perModelTimeoutMs ?? DEFAULT_PER_MODEL_TIMEOUT_MS;

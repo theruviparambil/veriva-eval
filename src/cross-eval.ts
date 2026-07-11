@@ -96,7 +96,7 @@ async function main(): Promise<void> {
   const panel = resolvePanel();
   if (panel.length === 0) {
     console.error(
-      "No judge models available. Copy .env.example to .env and set one key —\n" +
+      "No judge models available. Copy .env.example to .env and set one key:\n" +
         "OPENROUTER_API_KEY (one key, whole panel), or ANTHROPIC_API_KEY /\n" +
         "OPENAI_API_KEY / GOOGLE_API_KEY. The zero-key demo is `npm run replay`.",
     );
@@ -182,7 +182,7 @@ async function main(): Promise<void> {
   console.log(`  output:    ${args.outDir}`);
 
   if (!summary.meetsBar) {
-    console.error(`\ncross-eval: pass rate ${(passRate * 100).toFixed(1)}% < min bar ${(args.minPassRate * 100).toFixed(1)}% — failing build`);
+    console.error(`\ncross-eval: pass rate ${(passRate * 100).toFixed(1)}% < min bar ${(args.minPassRate * 100).toFixed(1)}%, failing build`);
     process.exit(1);
   }
 }

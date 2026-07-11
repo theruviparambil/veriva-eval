@@ -1,5 +1,5 @@
 /**
- * Cohen's kappa — chance-corrected agreement between two raters.
+ * Cohen's kappa: chance-corrected agreement between two raters.
  *
  *   kappa = (p_o - p_e) / (1 - p_e)
  *     p_o = observed agreement
@@ -76,7 +76,7 @@ export function cohensKappa(
 
 /** Agreement across a whole panel of raters (more than two). */
 export interface MultiRaterResult {
-  /** Items with at least two ratings — the ones agreement is defined over. */
+  /** Items with at least two ratings, the ones agreement is defined over. */
   n: number;
   /** Number of raters in the panel. */
   raters: number;

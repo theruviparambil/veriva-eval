@@ -112,7 +112,7 @@ function main(): void {
   console.log(`Krippendorff's alpha: ${ka.value.toFixed(3)} (${ka.interpretation})`);
 
   // Per-rater redundancy: mean pairwise Cohen's kappa is not a panel statistic,
-  // but it's a useful "agrees with everyone" view — a high value flags a rater
+  // but it's a useful "agrees with everyone" view. A high value flags a rater
   // that adds little independent signal.
   console.log("\n=== Rater redundancy (mean pairwise Cohen's kappa) ===");
   const kappaByRater = new Map<string, number[]>();

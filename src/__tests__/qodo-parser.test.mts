@@ -35,7 +35,7 @@ test('extracts findings from a typical review', () => {
 - src/handler.ts [line 12]: Race condition between setState and async fetch
 
 ### Security Concerns
-- src/api.ts:88 — SQL parameter not escaped — possible injection
+- src/api.ts:88, SQL parameter not escaped, possible injection
 
 ### General Suggestions
 - Consider extracting the validation block in src/utils.ts:55 into a helper
@@ -67,7 +67,7 @@ test('extracts file/line from `[line N]` pattern', () => {
 
 test('extracts file/line from `path:N` pattern', () => {
   const md = `### Possible Issues
-- src/handler.ts:99 — issue here
+- src/handler.ts:99, issue here
 `;
   const findings = parsePrAgentReview(md, 'a/b', 1);
   assert.equal(findings.length, 1);

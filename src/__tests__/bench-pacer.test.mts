@@ -1,5 +1,5 @@
 /**
- * Smoke tests for BenchPacer — node:assert, run via tsx (no vitest). Part of
+ * Smoke tests for BenchPacer, node:assert, run via tsx (no vitest). Part of
  * `npm run test:smoke`. Asserts the pacer behaviors with sleep disabled so the
  * suite is instant.
  *

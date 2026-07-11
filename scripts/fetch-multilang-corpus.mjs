@@ -25,14 +25,14 @@
  *
  * Stratified by category (fix / feature / refactor / security-fix /
  * perf / docs / chore) with round-robin across categories then
- * per-repo drain — matches the approach in fetch-corpus.mjs so the
+ * per-repo drain: matches the approach in fetch-corpus.mjs so the
  * resulting corpora are directly comparable.
  *
  * GitHub API budget: ~5x oversample of merged PR list × N repos +
  * 1 stats fetch per candidate. With 6 repos × 50 picks × 5x oversample
  * = ~1500 calls per language. The authenticated `gh` CLI gets 5000/hr,
  * so a single language fits comfortably; running all 3 languages
- * sequentially uses ~4500 — under the limit.
+ * sequentially uses ~4500, under the limit.
  */
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';

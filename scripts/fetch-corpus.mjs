@@ -15,7 +15,7 @@
  * Strategy: list recent closed PRs per repo (cap scales with target),
  * keep only merged ones, fetch each PR's stats (additions/deletions/files),
  * filter by size + recency, then take a per-repo target count. The
- * resulting corpus is reproducible — re-running yields a similar set
+ * resulting corpus is reproducible: re-running yields a similar set
  * (with newer PRs displacing older ones as repos accumulate merges).
  *
  * Scaling note: per-repo target = ceil(target × repoWeight) where popular
@@ -63,7 +63,7 @@ const SMALLER_REPOS = [
 const DEFAULT_TARGET_TOTAL = 100;
 const POPULAR_SHARE = 0.6; // 60% of corpus from popular repos
 const SMALLER_SHARE = 0.4; // 40% from smaller repos
-// gh pr list cap multiplier — we list this many candidates per repo to
+// gh pr list cap multiplier: we list this many candidates per repo to
 // ensure enough survive the additions/recency filters.
 const LIST_OVERSAMPLE = 5;
 const LIST_CAP_MAX = 1000; // gh pr list hard cap
@@ -128,7 +128,7 @@ function sizeClass(additions) {
 }
 
 async function listRecentMergedPRs(repo, limit = 50) {
-  // gh pr list with --json ... — fetches recent closed PRs and we filter
+  // gh pr list with --json ...: fetches recent closed PRs and we filter
   // to merged ones. The --search flag scopes to merged via `is:merged`.
   const cappedLimit = Math.min(limit, LIST_CAP_MAX);
   const args = [
@@ -147,7 +147,7 @@ async function listRecentMergedPRs(repo, limit = 50) {
 }
 
 async function fetchPrStats(repo, number) {
-  // gh pr view — returns additions/deletions/files from the GraphQL API.
+  // gh pr view: returns additions/deletions/files from the GraphQL API.
   const args = [
     "pr",
     "view",
@@ -222,7 +222,7 @@ async function pickFromRepo(repo, target) {
   const picked = [];
   const categoryOrder = ["fix", "feature", "refactor", "security-fix", "perf", "chore", "docs", "other"];
   let cursor = 0;
-  // Phase 1 — round-robin pick across categories so the corpus stays
+  // Phase 1: round-robin pick across categories so the corpus stays
   // category-diverse instead of being dominated by `feature`/`fix`.
   // Bounded by 2× target rounds so a sparse pool can't loop forever.
   const phase1Max = target * categoryOrder.length * 2;
@@ -234,7 +234,7 @@ async function pickFromRepo(repo, target) {
       picked.push(list.shift());
     }
   }
-  // Phase 2 — drain any remaining items from any category until we hit
+  // Phase 2: drain any remaining items from any category until we hit
   // target or run dry. Previously this only pulled one per category and
   // broke, capping yield at ~half of target on imbalanced repos.
   if (picked.length < target) {

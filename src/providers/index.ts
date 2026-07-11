@@ -6,8 +6,8 @@
  * head-to-head on the same corpus and ground truth.
  *
  * Bundled providers:
- *   - baseline — one direct LLM call with a review prompt (./baseline.ts)
- *   - qodo     — shells out to qodo-ai/pr-agent (./qodo.ts)
+ *   - baseline : one direct LLM call with a review prompt (./baseline.ts)
+ *   - qodo     : shells out to qodo-ai/pr-agent (./qodo.ts)
  *
  * Add your own by implementing `Provider` and registering it in registry.ts.
  * Set `PROVIDERS_ENABLED=baseline,qodo` to choose which columns to run.
@@ -50,14 +50,14 @@ export interface ProviderResult {
 export interface ProviderInput {
   /** Unified diff text. */
   diff: string;
-  /** Repo identifier (owner/name) — providers may use this for context. */
+  /** Repo identifier (owner/name), providers may use this for context. */
   repo: string;
-  /** PR number — providers may use this to pull additional context. */
+  /** PR number, providers may use this to pull additional context. */
   prNumber: number;
 }
 
 export interface Provider {
-  /** Stable identifier — appears in benchmark output column headers. */
+  /** Stable identifier, appears in benchmark output column headers. */
   id: string;
   /** Human-readable label for reports. */
   label: string;
