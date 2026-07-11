@@ -1,12 +1,12 @@
 #!/usr/bin/env tsx
 /**
  * Reconciles two labeling passes and computes Cohen's kappa (the same rater
- * across two sessions — intra-rater reliability). Cohen's kappa is the correct
+ * across two sessions, intra-rater reliability). Cohen's kappa is the correct
  * statistic for two raters; the multi-rater panel uses Fleiss' kappa /
  * Krippendorff's alpha instead (see `npm run replay`).
  *
  * The kappa math comes from the one shared, unit-tested implementation in
- * `src/kappa.ts` — this script only reconciles the files and renders the report.
+ * `src/kappa.ts`. This script only reconciles the files and renders the report.
  *
  * Usage:
  *   tsx labeling/cohens-kappa.mts \

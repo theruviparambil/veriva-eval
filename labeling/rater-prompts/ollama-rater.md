@@ -1,17 +1,17 @@
-# Rater template — external / non-agentic model (Ollama driver)
+# Rater template: external / non-agentic model (Ollama driver)
 
-Use this to include a model that is **not** an agent with file access — you drive
+Use this to include a model that is **not** an agent with file access, you drive
 it one finding at a time through a local runner. The reference panel used Ollama
 (`ollama run <model> --format json`) for open models like qwen3-coder, deepseek,
 and glm, but any "prompt in → JSON out" runner works.
 
 Parameterize:
 
-- `KEY` — rater key (e.g. `d`). Output: `verdicts-<KEY>.jsonl`.
-- `MODEL` — the runner's model tag (e.g. `qwen3-coder:480b`, `deepseek-v3.1:671b`).
-- `RUBRIC_VERSION` — the rubric tag you label under.
+- `KEY`: rater key (e.g. `d`). Output: `verdicts-<KEY>.jsonl`.
+- `MODEL`: the runner's model tag (e.g. `qwen3-coder:480b`, `deepseek-v3.1:671b`).
+- `RUBRIC_VERSION`: the rubric tag you label under.
 
-The driver loop (pseudocode — adapt to your runner):
+The driver loop (pseudocode, adapt to your runner):
 
 ```
 rubric = read("labeling/RUBRIC.md")
@@ -35,7 +35,7 @@ Rules that matter for a clean κ signal:
 
 - Constrain the model to JSON output (`--format json` or equivalent) so parsing
   is deterministic.
-- One finding per call — don't batch; long contexts cause the model to anchor
+- One finding per call: don't batch; long contexts cause the model to anchor
   earlier verdicts onto later ones.
 - Echo back the exact `findingId` from the input so the comparison can align rows.
 - If the model returns malformed JSON, retry once, then record

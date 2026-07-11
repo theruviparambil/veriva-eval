@@ -92,7 +92,7 @@ npm run eval
 `eval` runs a small set of judge cases through a cross-model panel in parallel.
 Each model returns a 0–1 score with a rationale; the panel passes a case by
 quorum (default: ≥2 of 3 models score ≥0.8). It writes `results.jsonl` +
-`summary.json` and **exits non-zero if the pass-rate drops below a bar** — so you
+`summary.json` and **exits non-zero if the pass-rate drops below a bar**, so you
 can wire it into CI and a prompt regression fails the build like a unit test.
 
 One OpenRouter key runs a true cross-family panel (Anthropic + OpenAI + Google).
@@ -104,7 +104,7 @@ Or set native keys and the judge uses whatever's present, skipping the rest.
 PROVIDERS_ENABLED=baseline,qodo npm run bench
 ```
 
-This is the harness, not a shipped result — it needs your `gh` login and API
+This is the harness, not a shipped result. It needs your `gh` login and API
 keys, and writes the comparison to `out/` when you run it. Each tool runs over
 the same PR corpus and reports findings, cost, and latency in one normalized
 shape. `baseline` is one direct LLM call; `qodo` shells out to
@@ -115,7 +115,7 @@ interface in `src/providers/`.
 
 ## The result worth talking about
 
-It isn't a precision number — it's that the method catches results you already
+It isn't a precision number: it's that the method catches results you already
 believed. An adversarial review by a *different* model (told to refute, not
 confirm) caught a train/serve skew in a calibration scorer: the trainer was
 learning from a feature the runtime serves as `null`, so the lab number could
@@ -157,24 +157,24 @@ docs/       RESULTS.md (methodology) · corpus-criteria.md
 
 The methodology, not just the math:
 
-- **`RUBRIC.md`** — the decision contract every rater applies. A verification
+- **`RUBRIC.md`**: the decision contract every rater applies. A verification
   protocol (verify, don't confirm) plus worked calibration anchors mined from
   the cases where strong models split. This is what makes κ measure rubric
   clarity instead of prompt drift.
-- **`cohens-kappa.mts`** — reconciles two label passes into a confusion matrix
+- **`cohens-kappa.mts`**: reconciles two label passes into a confusion matrix
   and Cohen's κ (the right statistic for two passes). `npm run kappa`.
-- **`rater-reliability.mts`** — per-rater report headed by the panel-level
+- **`rater-reliability.mts`**: per-rater report headed by the panel-level
   **Fleiss' κ / Krippendorff's α**, then abstention, label skew, redundant pairs
   (high *pairwise* κ = paying twice for one signal), and a KEEP / DOWN-WEIGHT /
   DROP call per model. `npm run reliability` (synthetic) or `npm run
   reliability:real` (the real 7-model panel). All three share `src/kappa.ts`.
-- **`RATER_HANDOFF.md` + `rater-prompts/`** — how to run a blind, cross-vendor
+- **`RATER_HANDOFF.md` + `rater-prompts/`**: how to run a blind, cross-vendor
   panel through a plain file contract (read `findings.jsonl`, write
   `verdicts-<key>.jsonl`, compare).
 
 ## Requirements
 
-- Node ≥ 20 (uses built-in `fetch` — no model SDKs).
+- Node ≥ 20 (uses built-in `fetch`, no model SDKs).
 - For `eval`: one API key (see `.env.example`).
 - For `bench`: an authenticated `gh` CLI, plus `uvx` for the `qodo` provider.
 
@@ -188,4 +188,4 @@ npm run check-types  # tsc, no emit
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).

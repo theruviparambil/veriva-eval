@@ -3,8 +3,8 @@
  *
  * The original judge primitive called models through an AWS Bedrock client with
  * a circuit-breaker / region-failover wrapper. This standalone version talks to
- * provider HTTP APIs directly with the built-in `fetch` (Node >= 20) — no SDKs,
- * no cloud account required — so a stranger can run it with whatever key they
+ * provider HTTP APIs directly with the built-in `fetch` (Node >= 20, no SDKs,
+ * no cloud account required), so a stranger can run it with whatever key they
  * already have.
  *
  * Two transports cover the field:
@@ -77,7 +77,7 @@ export function resolvePanel(): ModelSpec[] {
 
 /**
  * Dispatch a single (system, user) prompt to one model and return its raw text.
- * Throws on transport error, non-2xx, timeout, or an unparseable body — the
+ * Throws on transport error, non-2xx, timeout, or an unparseable body. The
  * caller decides how a failed model affects the quorum.
  */
 export async function callModel(spec: ModelSpec, opts: CallOptions): Promise<string> {

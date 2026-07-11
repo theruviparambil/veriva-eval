@@ -2,10 +2,10 @@ import { z } from "zod";
 
 // ─── Label space ───────────────────────────────────────────────────────────
 // The four-way verdict every rater (human or model) assigns to a finding.
-//   TP                   — true positive: a real defect the tool correctly flagged
-//   FP                   — false positive: the tool was wrong
-//   NEEDS_INVESTIGATION  — abstention: not confidently decidable from the evidence
-//   OUT_OF_SCOPE         — valid observation, but outside what we grade
+//   TP                   : true positive: a real defect the tool correctly flagged
+//   FP                   : false positive: the tool was wrong
+//   NEEDS_INVESTIGATION  : abstention: not confidently decidable from the evidence
+//   OUT_OF_SCOPE         : valid observation, but outside what we grade
 
 export const LABELS = ["TP", "FP", "NEEDS_INVESTIGATION", "OUT_OF_SCOPE"] as const;
 export type Label = (typeof LABELS)[number];

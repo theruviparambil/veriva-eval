@@ -14,7 +14,7 @@ Both pull merged PRs from public repos via the `gh` CLI using the criteria below
 A PR is eligible iff **all** of:
 
 1. **Merged** to a public OSS repo (state `closed` with `merged_at != null`).
-   Open/abandoned PRs are excluded — we want ground truth.
+   Open/abandoned PRs are excluded: we want ground truth.
 2. **Primary changed language** matches the target (TS/JS, or PY/GO/JAVA).
 3. **Diff size between 5 and 1500 added lines.** Tiny diffs (a README typo)
    generate no signal; huge diffs are usually mass renames or dependency bumps
@@ -22,7 +22,7 @@ A PR is eligible iff **all** of:
 4. **Recent (merged within the last 12 months).** Older PRs may reference
    deprecated APIs that inflate false-positive verdicts.
 5. **Repo is recognizable.** Popular (>10k stars) or a recognizable domain
-   (data infra, framework tooling, ORM) — not arbitrary toy repos.
+   (data infra, framework tooling, ORM), not arbitrary toy repos.
 6. **Linked issue or descriptive title** (`Fixes #...` / a classifiable title),
    so each row carries partial ground truth.
 
@@ -59,6 +59,6 @@ unrepresentative and brittle to corpus selection.
 The same criteria extend to Python, Go, and Java via
 `scripts/fetch-multilang-corpus.mjs`, which keeps per-language repo allow-lists
 and the same type/size mix so the sub-corpora are directly comparable. Reporting
-precision/recall *per language* is more honest than one blended number — it
+precision/recall *per language* is more honest than one blended number. It
 forces attention on the worst-performing language instead of hiding it in an
 average.

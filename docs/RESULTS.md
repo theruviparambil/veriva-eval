@@ -1,4 +1,4 @@
-# Results — validating an LLM judge
+# Results: validating an LLM judge
 
 This repo ships the methodology and tooling plus a redacted real run. The full
 private corpus stays private, but two panels are included: a synthetic sample
@@ -23,7 +23,7 @@ The models disagree, and the disagreement is the signal:
 - Some models catch nearly every real finding but over-call (high recall, lower
   precision). Others fire rarely but are almost always right (low recall, high
   precision). On the synthetic sample one rater labels everything a true positive
-  and lands at κ ≈ 0 — the rubber-stamp failure mode, made visible.
+  and lands at κ ≈ 0: the rubber-stamp failure mode, made visible.
 - Panel agreement (Fleiss' κ and Krippendorff's α) across independent frontier
   models tends to be *low*, often "poor" to "fair" on the standard scale. That
   isn't a flaw. They genuinely split on hard findings. A single judge hides that
@@ -68,5 +68,5 @@ Be careful with headline precision/recall figures:
 
 ## See also
 
-- [`../labeling/RUBRIC.md`](../labeling/RUBRIC.md) — the judge contract + calibration anchors.
-- [`corpus-criteria.md`](./corpus-criteria.md) — how the evaluation corpus is selected.
+- [`../labeling/RUBRIC.md`](../labeling/RUBRIC.md): the judge contract + calibration anchors.
+- [`corpus-criteria.md`](./corpus-criteria.md): how the evaluation corpus is selected.

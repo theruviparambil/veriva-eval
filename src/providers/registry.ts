@@ -1,5 +1,5 @@
 /**
- * Provider registry — look up provider instances by id.
+ * Provider registry: look up provider instances by id.
  *
  * Reads PROVIDERS_ENABLED from env (comma-separated). Defaults to "baseline".
  *

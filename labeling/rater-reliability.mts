@@ -3,7 +3,7 @@
  * Per-rater reliability report for the multi-vendor panel.
  *
  * Consumes a panel-comparison.json (raters + pairwiseKappa + consensus.entries)
- * and answers: *which raters can we trust, and which add noise?* — so we can fix
+ * and answers: *which raters can we trust, and which add noise?*, so we can fix
  * the panel composition before spending compute on a fresh run.
  *
  * Two different agreement questions, two different statistics:
@@ -13,7 +13,7 @@
  *   - **Rater redundancy** = pairwise Cohen's kappa between two raters. HIGH
  *     pairwise agreement means a pair is near-identical and one is enough; it is
  *     NOT the panel-agreement statistic. (Low pairwise kappa means a rater is
- *     independent — which a diverse panel wants.)
+ *     independent, which a diverse panel wants.)
  *
  * All kappa math is the one shared, unit-tested implementation in src/kappa.ts.
  *
@@ -199,13 +199,13 @@ async function main(): Promise<void> {
     const maxLabel = LABELS.find((l) => (s.dist[l] ?? 0) === maxCount);
     const maxShare = s.labeled ? maxCount / s.labeled : 0;
     if (maxShare > 0.8)
-      flags.push(`SKEWED (${(maxShare * 100).toFixed(0)}% ${maxLabel}) — low discriminating power; likely rubber-stamping the description`);
+      flags.push(`SKEWED (${(maxShare * 100).toFixed(0)}% ${maxLabel}): low discriminating power; likely rubber-stamping the description`);
     if (abstention > 0.4)
-      flags.push(`ABSTAINS (${(abstention * 100).toFixed(0)}% NI) — its NI votes carry no TP/FP signal; treat NI as abstention, or drop`);
+      flags.push(`ABSTAINS (${(abstention * 100).toFixed(0)}% NI): its NI votes carry no TP/FP signal; treat NI as abstention, or drop`);
     if (agree !== null && agree < 0.6)
-      flags.push(`LOW ACCURACY (${(agree * 100).toFixed(0)}% vs ${truth ? "adjudicated truth" : "majority"}) — diverges from the truth basis; down-weight`);
+      flags.push(`LOW ACCURACY (${(agree * 100).toFixed(0)}% vs ${truth ? "adjudicated truth" : "majority"}): diverges from the truth basis; down-weight`);
     if (redundantSet.has(k))
-      flags.push(`REDUNDANT with ${redundantSet.get(k)} (pairwise kappa ≥ ${args.redundantKappa}) — near-identical; one of the pair is enough`);
+      flags.push(`REDUNDANT with ${redundantSet.get(k)} (pairwise kappa ≥ ${args.redundantKappa}): near-identical; one of the pair is enough`);
     s.abstention = abstention;
     s.agree = agree;
     s.flags = flags;
@@ -243,7 +243,7 @@ async function main(): Promise<void> {
 
   L.push("## Lenient ↔ strict on SPLIT findings");
   L.push("");
-  L.push("How each rater voted on the contested findings — the TP-threshold signal.");
+  L.push("How each rater voted on the contested findings: the TP-threshold signal.");
   L.push("");
   L.push("| Rater | TP | FP | NI | OOS | leaning |");
   L.push("|---|---|---|---|---|---|");
@@ -263,7 +263,7 @@ async function main(): Promise<void> {
   if (redundantPairs.length) {
     L.push("## Redundant rater pairs");
     L.push("");
-    L.push(`Pairs with pairwise kappa ≥ ${args.redundantKappa} produce near-identical labels — they do not add independent signal. Keep one per pair.`);
+    L.push(`Pairs with pairwise kappa ≥ ${args.redundantKappa} produce near-identical labels. They do not add independent signal. Keep one per pair.`);
     L.push("");
     L.push("| Pair | pairwise kappa | observed agreement |");
     L.push("|---|---|---|");
@@ -277,11 +277,11 @@ async function main(): Promise<void> {
   L.push("");
   for (const k of raterKeys) {
     const s = stats[k]!;
-    L.push(`### ${k} — ${s.name}`);
+    L.push(`### ${k}: ${s.name}`);
     L.push("");
     L.push(`- **Recommendation: ${s.recommendation}**`);
     if (s.flags && s.flags.length) for (const f of s.flags) L.push(`  - ${f}`);
-    else L.push("  - No reliability flags — independent, agrees with the truth basis, not redundant.");
+    else L.push("  - No reliability flags: independent, agrees with the truth basis, not redundant.");
     L.push("");
   }
 

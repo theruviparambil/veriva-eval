@@ -7,20 +7,20 @@
  *
  * Hold the base model constant: PR-Agent is pointed at the SAME model as the
  * baseline (via `QODO_MODEL`, any litellm-supported id), so the benchmark
- * isolates the variable that matters — the orchestration framework — rather
+ * isolates the variable that matters (the orchestration framework) rather
  * than confounding it with a model swap.
  *
  * Runtime requirements:
- *   - `uvx` (https://docs.astral.sh/uv/) — launches pr-agent in an ephemeral
+ *   - `uvx` (https://docs.astral.sh/uv/): launches pr-agent in an ephemeral
  *     isolated env. First call cold-starts; later calls reuse the uv cache.
- *   - `gh` authenticated against github.com — pr-agent fetches PR context via
+ *   - `gh` authenticated against github.com: pr-agent fetches PR context via
  *     the GitHub API, using the token from `gh auth token` (or GITHUB_TOKEN).
  *   - Whatever credentials your `QODO_MODEL` needs, read by litellm from env
  *     (e.g. ANTHROPIC_API_KEY for an `anthropic/...` id).
  *
  * Finding normalization: pr-agent's `review` emits markdown with sections like
  * "Possible Issues" and "Security Concerns". Each bullet becomes a finding;
- * severity/category are inferred from headings (best-effort — pr-agent doesn't
+ * severity/category are inferred from headings (best-effort, pr-agent doesn't
  * emit structured severity). The parser is intentionally tolerant: on format
  * drift it captures as INFO/QUALITY rather than crashing.
  *
@@ -65,7 +65,7 @@ async function getGithubToken(): Promise<FetchGithubTokenResult> {
     return { token: process.env.GITHUB_TOKEN, source: 'env' };
   }
   // gh auth token works as long as the user is logged in via `gh auth login`.
-  // We don't fall back to anonymous fetches — pr-agent needs the API quota.
+  // We don't fall back to anonymous fetches: pr-agent needs the API quota.
   const { stdout } = await execFileAsync('gh', ['auth', 'token']);
   return { token: stdout.trim(), source: 'gh-cli' };
 }
@@ -85,7 +85,7 @@ async function getGithubToken(): Promise<FetchGithubTokenResult> {
  * extracted via regex when present; otherwise fall back to a placeholder
  * so the finding still appears in the comparison row.
  *
- * This is intentionally lossy — pr-agent's format is not stable across
+ * This is intentionally lossy: pr-agent's format is not stable across
  * versions, so we capture what we can without crashing on drift.
  */
 export function parsePrAgentReview(
@@ -96,7 +96,7 @@ export function parsePrAgentReview(
   const findings: ProviderFinding[] = [];
 
   // Split on `### ` headings (any depth). Skip the first chunk before
-  // the first heading — usually preamble.
+  // the first heading, usually preamble.
   const sections = markdown.split(/^###\s+/m);
   for (let i = 1; i < sections.length; i++) {
     const section = sections[i] ?? '';
@@ -200,7 +200,7 @@ async function runPrAgentReview(opts: RunPrAgentOptions): Promise<string> {
     CONFIG__VERBOSITY_LEVEL: '0',
   };
 
-  // 5min timeout per PR — enough for pr-agent's longest reviews on big
+  // 5min timeout per PR: enough for pr-agent's longest reviews on big
   // diffs while the bench's outer pacer keeps overall throughput sane.
   const { stdout } = await execFileAsync(
     'uvx',

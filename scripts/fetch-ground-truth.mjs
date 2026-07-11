@@ -10,7 +10,7 @@
  * Defaults to data/corpus-v1.json. Output written next to
  * the input as <basename>.ground-truth.json.
  *
- * This script is intentionally JS (not TS) — same as fetch-corpus.mjs —
+ * This script is intentionally JS (not TS), same as fetch-corpus.mjs,
  * so it can run without a build step.
  */
 import { execFile } from "node:child_process";
@@ -224,7 +224,7 @@ async function main() {
   };
   await writeFile(outPath, JSON.stringify(summary, null, 2), "utf-8");
   console.error(
-    `\n[gt] wrote ${outPath} — ${summary.prsWithSignal}/${summary.totalPrs} PRs have at least one ground-truth signal`,
+    `\n[gt] wrote ${outPath}: ${summary.prsWithSignal}/${summary.totalPrs} PRs have at least one ground-truth signal`,
   );
 }
 

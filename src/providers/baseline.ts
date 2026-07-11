@@ -1,5 +1,5 @@
 /**
- * Baseline provider — a single direct LLM call with a review prompt.
+ * Baseline provider: a single direct LLM call with a review prompt.
  *
  * This is the "home tool" column: one frontier model, one prompt, no
  * orchestration. Comparing it against a framework provider (e.g. qodo) on the
@@ -15,7 +15,7 @@ import type { Provider, ProviderFinding, ProviderInput, ProviderResult } from ".
 
 const REVIEW_SYSTEM_PROMPT = `You are a precise code reviewer. Review the unified diff for real defects: security vulnerabilities, correctness bugs, and clear quality problems. Do not invent issues.
 
-Return STRICT JSON and nothing else — an array of findings:
+Return STRICT JSON and nothing else, an array of findings:
 [
   {
     "ruleId": "<short stable id, e.g. SECURITY.SQL_INJECTION>",
@@ -79,7 +79,7 @@ export function createBaselineProvider(): Provider {
           findings: [],
           usage: { latencyMs: 0, costCents: 0 },
           errored: true,
-          errorMessage: "no model available — set an API key (see .env.example)",
+          errorMessage: "no model available: set an API key (see .env.example)",
         };
       }
       try {
