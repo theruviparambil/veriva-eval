@@ -11,6 +11,19 @@
  * Two panels ship: data/sample/panel/ (synthetic, the zero-key default) and
  * data/panel-real/ (a redacted real 7-model run over public-OSS PRs, via
  * `npm run replay:real`). Point it at your own export with `--dir=path/to/panel`.
+ *
+ * Usage:
+ *
+ *   tsx src/replay.ts [--dir=path/to/panel] [--fail-under=0.6]
+ *
+ * `--fail-under` turns the replay into a CI check: it exits 1 unless BOTH
+ * Fleiss' kappa and Krippendorff's alpha reach the threshold. Requiring both
+ * matters because a panel can clear one coefficient and miss the other, and
+ * that disagreement is the borderline case worth stopping for.
+ *
+ * Exit codes: 0 ok, 1 the gate was requested and the panel fell short,
+ * 2 usage or input error. Keeping those apart lets CI tell "this panel does not
+ * agree enough" from "you pointed me at the wrong directory".
  */
 import { fileURLToPath } from "node:url";
 import { dirname, resolve, basename } from "node:path";
@@ -20,9 +33,30 @@ import { LABELS, type Label } from "./types.js";
 
 const DEFAULT_DIR = resolve(dirname(fileURLToPath(import.meta.url)), "../data/sample/panel");
 
-function parseDir(argv: string[]): string {
-  const arg = argv.find((a) => a.startsWith("--dir="));
-  return arg ? resolve(arg.slice("--dir=".length)) : DEFAULT_DIR;
+interface Args {
+  dir: string;
+  failUnder?: number;
+}
+
+function parseArgs(argv: string[]): Args {
+  const dirArg = argv.find((a) => a.startsWith("--dir="));
+  const out: Args = { dir: dirArg ? resolve(dirArg.slice("--dir=".length)) : DEFAULT_DIR };
+
+  const gateArg = argv.find((a) => a.startsWith("--fail-under="));
+  if (gateArg) {
+    const raw = gateArg.slice("--fail-under=".length);
+    const value = Number(raw);
+    if (raw.trim() === "" || !Number.isFinite(value)) {
+      console.error(`replay: --fail-under=${raw} is not a number`);
+      process.exit(2);
+    }
+    if (value < -1 || value > 1) {
+      console.error(`replay: --fail-under=${raw} is outside the range of a kappa coefficient (-1 to 1)`);
+      process.exit(2);
+    }
+    out.failUnder = value;
+  }
+  return out;
 }
 
 interface Verdict {
@@ -61,10 +95,11 @@ function pad(s: string, w: number): string {
 }
 
 function main(): void {
-  const dir = parseDir(process.argv.slice(2));
+  const { dir, failUnder } = parseArgs(process.argv.slice(2));
   if (!existsSync(resolve(dir, "truth.json"))) {
     console.error(`replay: no truth.json in ${dir}`);
-    process.exit(1);
+    // 2, not 1: an unreadable panel is a usage error, and 1 now means the gate failed.
+    process.exit(2);
   }
   const truth = loadTruth(dir);
   const note = (JSON.parse(readFileSync(resolve(dir, "truth.json"), "utf8")) as { note?: string }).note ?? "";
@@ -74,7 +109,7 @@ function main(): void {
     .sort();
   if (raters.length === 0) {
     console.error(`replay: no <model>.jsonl rater files in ${dir}`);
-    process.exit(1);
+    process.exit(2);
   }
   const labelsByRater = new Map<string, Map<string, string>>();
   for (const r of raters) labelsByRater.set(r, loadLabels(resolve(dir, `${r}.jsonl`)));
@@ -138,6 +173,21 @@ function main(): void {
       "judge quorum and human adjudication exist to resolve.",
   );
   if (note) console.log(`\n${note}`);
+
+  // Gate last, so a failing run still prints everything needed to diagnose it.
+  if (failUnder !== undefined) {
+    const short: string[] = [];
+    if (fk.value < failUnder) short.push(`Fleiss' kappa ${fk.value.toFixed(3)} < ${failUnder.toFixed(3)}`);
+    if (ka.value < failUnder) short.push(`Krippendorff's alpha ${ka.value.toFixed(3)} < ${failUnder.toFixed(3)}`);
+    console.log("\n=== Gate ===");
+    if (short.length === 0) {
+      console.log(`PASS  both coefficients are at or above ${failUnder.toFixed(3)}`);
+    } else {
+      for (const line of short) console.log(`FAIL  ${line}`);
+      // exitCode, not exit(): let stdout flush first.
+      process.exitCode = 1;
+    }
+  }
 }
 
 main();

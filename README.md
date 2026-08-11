@@ -70,6 +70,29 @@ over-calls; Grok fires twice and is never wrong. Low panel agreement is the
 finding, not a bug: independent frontier models split on hard findings, and that
 split is what the quorum and adjudication exist to resolve.
 
+### Gating CI
+
+`--fail-under` turns replay into a check:
+
+```bash
+npm run replay:real -- --fail-under=0.6
+```
+
+It exits 1 unless Fleiss' κ **and** Krippendorff's α both reach the threshold.
+Requiring both matters: on this panel `--fail-under=0.14` fails on Fleiss
+(0.135) while Krippendorff (0.141) clears it, and that gap is exactly the
+borderline case worth stopping for.
+
+| exit | meaning |
+| --- | --- |
+| 0 | ran fine, and any requested gate passed |
+| 1 | `--fail-under` was given and the panel fell short |
+| 2 | usage or input error |
+
+There is no default threshold, so omitting the flag never fails a build. How
+much agreement is enough depends on what the panel decides and what a wrong
+call costs.
+
 ## Why κ instead of accuracy
 
 Say your corpus of findings is 90% false positives. A lazy judge that always
