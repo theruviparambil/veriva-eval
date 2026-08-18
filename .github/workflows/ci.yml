@@ -1,0 +1,73 @@
+name: CI
+
+# This repo's headline feature is `--fail-under`, a gate you wire into CI. It had
+# no CI of its own, which is the sort of thing a reader notices before they read
+# any of the code. So this runs the gate on the committed real panel as well as
+# the test suite: if the published kappa stops reproducing, the build fails the
+# same way a consumer's would.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ["20", "22"]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - name: Type check
+        run: npm run check-types
+      - name: Unit tests
+        run: npm test
+      - name: Smoke tests
+        run: npm run test:smoke
+
+  reproduces:
+    name: the published numbers still reproduce
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+
+      # No API key needed: replay recomputes agreement from the committed panel.
+      - name: Replay the real 7-model panel
+        run: npm run replay:real
+
+      # Exercise the gate this project exists to provide. The real panel sits at
+      # Fleiss 0.135 / Krippendorff 0.141, so 0.1 must pass and 0.6 must fail.
+      # A gate that cannot fail is not a gate.
+      - name: Gate passes below the panel's agreement
+        run: npm run replay:real -- --fail-under=0.1
+
+      - name: Gate fails above the panel's agreement
+        run: |
+          if npm run replay:real -- --fail-under=0.6; then
+            echo "::error::--fail-under=0.6 should have failed on a 0.135 panel"
+            exit 1
+          fi
+
+      - name: Rater reliability report
+        run: npm run reliability:real
