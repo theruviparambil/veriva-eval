@@ -55,9 +55,11 @@ public OSS repos (Cal.com, Discourse), against an independently adjudicated trut
 set. The model reasoning ships with the labels, so you can read why they split.
 
 ```
-rater       recall (caught real TP)   precision (TP calls correct)
+findings: 23  ·  adjudicated TP: 15  ·  decided (TP or FP): 16
+
+rater       recall (caught real TP)   precision (on decided)
 claude      80% (12/15)               92% (12/13)
-gemini      100% (15/15)              83% (15/18)
+gemini      100% (15/15)              100% (15/15)
 gpt         67% (10/15)               100% (10/10)
 grok        13% (2/15)                100% (2/2)
 ...
@@ -65,10 +67,26 @@ Fleiss' kappa:        0.135 (poor)
 Krippendorff's alpha: 0.141 (poor)
 ```
 
-Real models, real disagreement. Gemini catches every true positive and
-over-calls; Grok fires twice and is never wrong. Low panel agreement is the
-finding, not a bug: independent frontier models split on hard findings, and that
-split is what the quorum and adjudication exist to resolve.
+Real models, real disagreement. Recall separates them cleanly: Gemini catches
+every true positive, Grok catches two of fifteen.
+
+**Precision does not, and an earlier version of this table said otherwise.**
+It scored a rater's TP call against every finding, including the 7 the
+adjudicator marked NEEDS_INVESTIGATION. NI is the adjudicator abstaining, not a
+negative, so a rater was charged for deciding something the truth basis
+declined to. That printed Gemini at 83% and the text above this block used to
+read "Gemini catches every true positive and over-calls." Gemini never called
+TP on anything adjudicated FP; restricted to the 16 decided findings it is
+15/15.
+
+Precision is now computed over decided findings only, and it still estimates
+almost nothing here: there is **one** adjudicated negative in 23 findings, so a
+rater that called TP on everything decided would score 94%. The replay prints
+that warning itself. Read the recall column.
+
+Low panel agreement is the finding, not a bug: independent frontier models
+split on hard findings, and that split is what the quorum and adjudication
+exist to resolve.
 
 ### Gating CI
 

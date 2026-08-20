@@ -158,26 +158,50 @@ function main(): void {
   for (const r of raters) labelsByRater.set(r, loadLabels(resolve(dir, `${r}.jsonl`)));
 
   const truthTp = [...truth.entries()].filter(([, l]) => l === "TP").map(([id]) => id);
+  // Precision is only defined over findings the adjudicator actually decided.
+  // NEEDS_INVESTIGATION is an abstention by the adjudicator, not a negative, and
+  // scoring a rater's TP call against it charged the rater for deciding
+  // something the truth basis declined to. On this panel that turned gemini's
+  // 15/15 into 15/18 and read as "over-calls", when gemini never once called TP
+  // on anything adjudicated FP.
+  const decided = [...truth.entries()]
+    .filter(([, l]) => l === "TP" || l === "FP")
+    .map(([id]) => id);
+  const decidedSet = new Set(decided);
+  const negatives = decided.length - truthTp.length;
+
   console.log("=== Cross-model panel: recall + precision vs adjudicated truth ===");
   console.log(`panel dir: ${dir}`);
-  console.log(`findings: ${truth.size}  ·  adjudicated TP: ${truthTp.length}\n`);
-  console.log(`${pad("rater", 12)}${pad("recall (caught real TP)", 26)}precision (TP calls correct)`);
+  console.log(
+    `findings: ${truth.size}  ·  adjudicated TP: ${truthTp.length}  ·  ` +
+      `decided (TP or FP): ${decided.length}\n`,
+  );
+  console.log(`${pad("rater", 12)}${pad("recall (caught real TP)", 26)}precision (on decided)`);
   for (const r of raters) {
     const labels = labelsByRater.get(r)!;
     // recall: of all adjudicated-TP findings, how many did this rater call TP?
     // A truth-TP the rater skipped or labeled non-TP both count as a miss.
     let caught = 0;
     for (const id of truthTp) if (labels.get(id) === "TP") caught += 1;
-    // precision: of this rater's TP calls, how many are truly TP?
+    // precision: of this rater's TP calls ON DECIDED FINDINGS, how many are TP?
     let pd = 0;
     let pn = 0;
     for (const [id, l] of labels) {
-      if (l === "TP") {
+      if (l === "TP" && decidedSet.has(id)) {
         pd += 1;
         if (truth.get(id) === "TP") pn += 1;
       }
     }
     console.log(`${pad(r, 12)}${pad(pct(caught, truthTp.length), 26)}${pct(pn, pd)}`);
+  }
+  if (negatives < 5) {
+    console.log(
+      `\nPrecision here rests on ${negatives} adjudicated ` +
+        `${negatives === 1 ? "negative" : "negatives"}. It is reported for completeness and ` +
+        "estimates almost nothing: a rater\n" +
+        "that called TP on everything decided would still score " +
+        `${((100 * truthTp.length) / decided.length).toFixed(0)}%. Read the recall column.`,
+    );
   }
 
   // Panel-level agreement: Fleiss' kappa + Krippendorff's alpha, the recognized

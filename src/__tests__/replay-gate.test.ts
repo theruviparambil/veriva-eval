@@ -148,3 +148,38 @@ describe("the gate cannot be turned off by accident", () => {
     rmSync(dir, { recursive: true, force: true });
   });
 });
+
+describe("precision is scored over decided findings only", () => {
+  // NEEDS_INVESTIGATION is the adjudicator abstaining, not a negative. Scoring
+  // a rater's TP call against it charged the rater for deciding something the
+  // truth basis declined to, which printed gemini at 83% and produced the
+  // "Gemini over-calls" reading. Gemini never called TP on anything
+  // adjudicated FP.
+  const out = spawnSync("npx", ["tsx", "src/replay.ts", "--dir=data/panel-real"], {
+    encoding: "utf8",
+    cwd: process.cwd(),
+  }).stdout;
+
+  it("reports the decided count next to the finding count", () => {
+    expect(out).toContain("decided (TP or FP): 16");
+  });
+
+  it("scores gemini 15/15, not 15/18", () => {
+    expect(out).toMatch(/gemini\s+100% \(15\/15\)\s+100% \(15\/15\)/);
+  });
+
+  it("still penalizes the rater that called TP on the one real FP", () => {
+    // glm is the only rater whose precision is below 100% on decided findings.
+    expect(out).toMatch(/glm\s+100% \(15\/15\)\s+94% \(15\/16\)/);
+  });
+
+  it("warns that one negative cannot support a precision estimate", () => {
+    expect(out).toContain("rests on 1 adjudicated negative");
+    expect(out).toContain("Read the recall column");
+  });
+
+  it("leaves recall untouched", () => {
+    expect(out).toMatch(/grok\s+13% \(2\/15\)/);
+    expect(out).toMatch(/claude\s+80% \(12\/15\)/);
+  });
+});
