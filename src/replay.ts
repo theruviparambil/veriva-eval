@@ -42,6 +42,22 @@ function parseArgs(argv: string[]): Args {
   const dirArg = argv.find((a) => a.startsWith("--dir="));
   const out: Args = { dir: dirArg ? resolve(dirArg.slice("--dir=".length)) : DEFAULT_DIR };
 
+  // Reject anything unrecognized. `--failunder=0.9` (no hyphen) used to be
+  // silently ignored, so the gate never ran, nothing printed, and CI went
+  // green. A tool whose headline feature is a CI gate must not let a typo turn
+  // it off. Same for `--dir path` with a space, which quietly gated the sample
+  // panel instead of the one you named.
+  const KNOWN = ["--dir=", "--fail-under="];
+  for (const arg of argv) {
+    if (!arg.startsWith("--")) continue;
+    if (!KNOWN.some((k) => arg.startsWith(k))) {
+      console.error(
+        `replay: unknown option ${arg}. Expected ${KNOWN.map((k) => k + "...").join(" or ")}.`,
+      );
+      process.exit(2);
+    }
+  }
+
   const gateArg = argv.find((a) => a.startsWith("--fail-under="));
   if (gateArg) {
     const raw = gateArg.slice("--fail-under=".length);
@@ -79,10 +95,37 @@ function loadLabels(path: string): Map<string, string> {
   return map;
 }
 
+/**
+ * Read `truth.json`, validating its shape rather than casting to it.
+ *
+ * The cast was load-bearing and wrong: `{}` threw a TypeError on
+ * `adj.verdicts`, and unparseable JSON threw a SyntaxError, both escaping as
+ * exit 1. That is the code the exit table reserves for "the panel fell short",
+ * so CI could not tell a broken export from a real agreement failure, which is
+ * the entire reason 1 and 2 are separate codes. `corpus.ts` validates with Zod;
+ * this had nothing.
+ */
+/** Input the tool cannot read. Exits 2, never 1. */
+class UsageError extends Error {}
+
 function loadTruth(dir: string): Map<string, string> {
-  const adj = JSON.parse(readFileSync(resolve(dir, "truth.json"), "utf8")) as { verdicts: Verdict[] };
+  const path = resolve(dir, "truth.json");
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(readFileSync(path, "utf8"));
+  } catch (err) {
+    throw new UsageError(`${path} is not valid JSON: ${(err as Error).message}`);
+  }
+  if (typeof parsed !== "object" || parsed === null || !Array.isArray((parsed as { verdicts?: unknown }).verdicts)) {
+    throw new UsageError(`${path} must be an object with a "verdicts" array.`);
+  }
   const map = new Map<string, string>();
-  for (const v of adj.verdicts) if (v.findingId && v.label) map.set(v.findingId, v.label);
+  for (const v of (parsed as { verdicts: Verdict[] }).verdicts) {
+    if (v && typeof v === "object" && v.findingId && v.label) map.set(v.findingId, v.label);
+  }
+  if (map.size === 0) {
+    throw new UsageError(`${path} yielded no usable verdicts.`);
+  }
   return map;
 }
 
@@ -181,9 +224,23 @@ function main(): void {
     // kappa.ts return 0, which is the right value and is not a measurement, so a
     // gate reading only `.value` passed `--fail-under=0` on a panel the report
     // itself calls undefined. An undefined coefficient meets no threshold.
+    // A coefficient computed over a handful of items is not a measurement you
+    // can gate on. Without this, a panel of 7 raters agreeing on 2 findings
+    // printed "PASS both coefficients are at or above 0.900": any panel could
+    // be made to pass by shrinking it. `fk.n` was computed and printed and
+    // never read.
+    const MIN_ITEMS = 5;
+    if (fk.n < MIN_ITEMS) {
+      short.push(
+        `only ${fk.n} comparable ${fk.n === 1 ? "finding" : "findings"}, ` +
+          `below the ${MIN_ITEMS} needed for a coefficient worth gating on`,
+      );
+    }
     const undefinedCoefficient =
       fk.interpretation.startsWith("undefined") || ka.interpretation.startsWith("undefined");
-    if (undefinedCoefficient) {
+    if (fk.n < MIN_ITEMS) {
+      // already reported above; do not also report a threshold miss
+    } else if (undefinedCoefficient) {
       short.push(
         "agreement is undefined (no comparable items, or every rating in one category), " +
           "so no threshold can be met",
@@ -203,4 +260,15 @@ function main(): void {
   }
 }
 
-main();
+try {
+  main();
+} catch (err) {
+  // UsageError means we could not read what we were pointed at. That is exit 2,
+  // not 1: CI must be able to tell a broken export from a real agreement
+  // failure, which is why the two codes were split apart.
+  if (err instanceof UsageError) {
+    console.error(`replay: ${err.message}`);
+    process.exit(2);
+  }
+  throw err;
+}

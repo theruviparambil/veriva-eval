@@ -136,10 +136,19 @@ describe("degenerate panels are not measurements", () => {
     expect(got.interpretation).toBe(UNDEFINED_NO_VARIANCE);
   });
 
-  it("a rubber-stamp panel cannot clear a 0.9 gate", () => {
-    const f = fleissKappa(stampers, LABELS as unknown as string[]);
-    const k = krippendorffAlpha(stampers, LABELS as unknown as string[]);
-    expect(f.value >= 0.9 && k.value >= 0.9).toBe(false);
+  it("reports the no-variance case, not a number a gate could clear", () => {
+    // The previous version of this test asserted `f.value >= 0.9 && ... === false`
+    // on two values the two tests above already pin to exactly 0, so it could
+    // only fail if those failed first. It also tested two numbers rather than
+    // the gate its name promised; the gate lives in replay.ts and is covered
+    // end to end in replay-gate.test.ts.
+    for (const got of [
+      fleissKappa(stampers, LABELS as unknown as string[]),
+      krippendorffAlpha(stampers, LABELS as unknown as string[]),
+    ]) {
+      expect(got.interpretation).toBe(UNDEFINED_NO_VARIANCE);
+      expect(got.interpretation.startsWith("undefined")).toBe(true);
+    }
   });
 
   it("cohen reports undefined, not near perfect, for two constant raters", () => {

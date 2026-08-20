@@ -11,7 +11,9 @@
 import { describe, it, expect } from "vitest";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { dirname, resolve } from "node:path";
+import { dirname, resolve, join } from "node:path";
+import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const TSX = resolve(ROOT, "node_modules/.bin/tsx");
@@ -82,5 +84,67 @@ describe("replay --fail-under", () => {
       encoding: "utf8",
     });
     expect(r.status).toBe(2);
+  });
+});
+
+describe("the gate cannot be turned off by accident", () => {
+  // Each of these used to be a silent bypass on a tool whose headline feature
+  // is a CI gate.
+  const run = (args: string[], dir: string) =>
+    spawnSync("npx", ["tsx", "src/replay.ts", `--dir=${dir}`, ...args], {
+      encoding: "utf8",
+      cwd: process.cwd(),
+    });
+
+  it("rejects an unknown flag instead of ignoring it", () => {
+    // `--failunder=0.9` exited 0, printed no gate at all, and CI went green.
+    const got = run(["--failunder=0.9"], "data/panel-real");
+    expect(got.status).toBe(2);
+    expect(got.stderr).toContain("unknown option");
+  });
+
+  it("rejects --dir given with a space rather than gating the wrong panel", () => {
+    const got = spawnSync("npx", ["tsx", "src/replay.ts", "--dir", "data/panel-real"], {
+      encoding: "utf8",
+      cwd: process.cwd(),
+    });
+    expect(got.status).toBe(2);
+  });
+
+  it("refuses to gate a panel too small to measure", () => {
+    // 7 raters agreeing on 2 findings printed PASS at 0.900. Any panel could
+    // be made to pass by shrinking it.
+    const dir = mkdtempSync(join(tmpdir(), "veriva-tiny-"));
+    for (const r of ["a", "b", "c"]) {
+      writeFileSync(
+        join(dir, `${r}.jsonl`),
+        '{"findingId":"f1","label":"TP"}\n{"findingId":"f2","label":"TP"}\n',
+      );
+    }
+    writeFileSync(
+      join(dir, "truth.json"),
+      '{"verdicts":[{"findingId":"f1","label":"TP"},{"findingId":"f2","label":"TP"}]}',
+    );
+    const got = run(["--fail-under=0.9"], dir);
+    expect(got.status).toBe(1);
+    expect(got.stdout).toContain("comparable findings");
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  it.each([
+    ["empty object", "{}"],
+    ["not json", "not json"],
+    ["scalar verdicts", '{"verdicts": 3}'],
+    ["no usable verdicts", '{"verdicts": []}'],
+  ])("exits 2, not 1, on malformed truth.json: %s", (_name, body) => {
+    // Exit 1 means "the panel fell short". A broken export is not that, and CI
+    // could not tell the two apart.
+    const dir = mkdtempSync(join(tmpdir(), "veriva-bad-"));
+    for (const r of ["a", "b"]) {
+      writeFileSync(join(dir, `${r}.jsonl`), '{"findingId":"f1","label":"TP"}\n');
+    }
+    writeFileSync(join(dir, "truth.json"), body);
+    expect(run([], dir).status).toBe(2);
+    rmSync(dir, { recursive: true, force: true });
   });
 });
