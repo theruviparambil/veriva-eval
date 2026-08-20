@@ -169,3 +169,38 @@ describe("degenerate panels are not measurements", () => {
     expect(got.n).toBe(items.length);
   });
 });
+
+describe("no comparable items is not a measurement either", () => {
+  // Distinct from the no-variance case: there were no items to compare at all.
+  // krippendorffAlpha returned 1 ("near perfect") here while fleissKappa
+  // returned 0 ("poor") on identical input, so the same panel got opposite
+  // verdicts from two coefficients printed three lines apart, and the one
+  // saying "near perfect" cleared any --fail-under.
+  const LABELS = ["TP", "FP", "NEEDS_INVESTIGATION", "OUT_OF_SCOPE"];
+
+  it("a single rater has nothing to compare against", () => {
+    const panel = [new Map([["f1", "TP"]])];
+    expect(krippendorffAlpha(panel, LABELS).interpretation).toBe(UNDEFINED);
+    expect(fleissKappa(panel, LABELS).interpretation).toBe(UNDEFINED);
+  });
+
+  it("an empty panel is undefined, not near perfect and not poor", () => {
+    expect(krippendorffAlpha([], LABELS).interpretation).toBe(UNDEFINED);
+    expect(fleissKappa([], LABELS).interpretation).toBe(UNDEFINED);
+  });
+
+  it("the two coefficients agree with each other on degenerate input", () => {
+    const panel = [new Map([["f1", "TP"]])];
+    const f = fleissKappa(panel, LABELS);
+    const k = krippendorffAlpha(panel, LABELS);
+    expect(k.value).toBe(f.value);
+    expect(k.interpretation).toBe(f.interpretation);
+  });
+
+  it("neither can clear a zero threshold", () => {
+    const panel = [new Map([["f1", "TP"]])];
+    for (const got of [fleissKappa(panel, LABELS), krippendorffAlpha(panel, LABELS)]) {
+      expect(got.interpretation.startsWith("undefined")).toBe(true);
+    }
+  });
+});

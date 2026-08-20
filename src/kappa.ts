@@ -152,7 +152,9 @@ export function fleissKappa(
   }
 
   if (usedItems === 0 || totalAssignments === 0) {
-    return { n: 0, raters: raters.length, value: 0, interpretation: interpretKappa(0) };
+    // "poor" reads as a finding. Nothing was comparable, which is the absence
+    // of one. This is exactly what the UNDEFINED constant exists for.
+    return { n: 0, raters: raters.length, value: 0, interpretation: UNDEFINED };
   }
   const pBar = pBarSum / usedItems;
   let pE = 0;
@@ -213,7 +215,13 @@ export function krippendorffAlpha(
     n += nC[c]!;
   }
   if (usedItems === 0 || n <= 1) {
-    return { n: usedItems, raters: raters.length, value: 1, interpretation: interpretKappa(1) };
+    // Nothing comparable. Alpha's own algebra does tend to 1 here, but Fleiss
+    // reports 0 on the identical input and 1.0 clears any --fail-under, so a
+    // panel with nothing in it passed the gate on one coefficient while the
+    // other called it "poor". Three functions must not give three answers to
+    // one question, and the one that says "near perfect" is the one that
+    // clears gates. Neither number is a measurement; saying so is better.
+    return { n: usedItems, raters: raters.length, value: 0, interpretation: UNDEFINED };
   }
   let doSum = 0;
   let deSum = 0;
