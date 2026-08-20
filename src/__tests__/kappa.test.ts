@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { cohensKappa, fleissKappa, interpretKappa, krippendorffAlpha } from "../kappa.js";
+import {
+  UNDEFINED,
+  UNDEFINED_NO_VARIANCE,
+  cohensKappa,
+  fleissKappa,
+  interpretKappa,
+  krippendorffAlpha,
+} from "../kappa.js";
 
 const TWO = ["TP", "FP"] as const;
 
@@ -102,5 +109,63 @@ describe("krippendorffAlpha", () => {
       [1, 2, 3, 3, 2, 4, 4, 1, 2, 5, 1, null],
     ].map((r) => r.map((v) => (v === null ? null : v - 1)));
     expect(krippendorffAlpha(ratersFrom(rows, FIVE), FIVE).value).toBeCloseTo(0.743, 2);
+  });
+});
+
+describe("degenerate panels are not measurements", () => {
+  // These branches returned 1 ("near perfect"), which is the 0/0 case and not
+  // perfect agreement. Two raters that both say TP to everything are the
+  // textbook case kappa exists to catch, and 1.0 clears any --fail-under, so a
+  // panel of rubber stamps passed the gate this repo ships.
+  const LABELS = ["TP", "FP", "NEEDS_INVESTIGATION", "OUT_OF_SCOPE"] as const;
+  const items = Array.from({ length: 23 }, (_, i) => `f${i}`);
+  const stampers = Array.from(
+    { length: 7 },
+    () => new Map(items.map((i) => [i, "TP"] as const)),
+  );
+
+  it("fleiss reports undefined, not near perfect, when every rating is one category", () => {
+    const got = fleissKappa(stampers, LABELS as unknown as string[]);
+    expect(got.value).toBe(0);
+    expect(got.interpretation).toBe(UNDEFINED_NO_VARIANCE);
+  });
+
+  it("krippendorff agrees with fleiss on that panel", () => {
+    const got = krippendorffAlpha(stampers, LABELS as unknown as string[]);
+    expect(got.value).toBe(0);
+    expect(got.interpretation).toBe(UNDEFINED_NO_VARIANCE);
+  });
+
+  it("a rubber-stamp panel cannot clear a 0.9 gate", () => {
+    const f = fleissKappa(stampers, LABELS as unknown as string[]);
+    const k = krippendorffAlpha(stampers, LABELS as unknown as string[]);
+    expect(f.value >= 0.9 && k.value >= 0.9).toBe(false);
+  });
+
+  it("cohen reports undefined, not near perfect, for two constant raters", () => {
+    const constant = new Map(items.map((i) => [i, "TP"] as const));
+    const got = cohensKappa(constant, new Map(constant), LABELS as unknown as string[]);
+    expect(got.kappa).toBe(0);
+    expect(got.interpretation).toBe(UNDEFINED_NO_VARIANCE);
+    expect(got.n).toBe(items.length);
+  });
+
+  it("two raters with no shared items are undefined, not poor", () => {
+    // "poor" sounds like a finding. They were never compared.
+    const got = cohensKappa(
+      new Map([["i1", "TP"]]),
+      new Map([["i2", "FP"]]),
+      LABELS as unknown as string[],
+    );
+    expect(got.n).toBe(0);
+    expect(got.interpretation).toBe(UNDEFINED);
+  });
+
+  it("a real panel is still scored normally", () => {
+    const a = new Map(items.map((i, n) => [i, n % 2 ? "TP" : "FP"] as const));
+    const b = new Map(items.map((i, n) => [i, n % 3 ? "TP" : "FP"] as const));
+    const got = cohensKappa(a, b, LABELS as unknown as string[]);
+    expect(got.interpretation).not.toBe(UNDEFINED_NO_VARIANCE);
+    expect(got.n).toBe(items.length);
   });
 });

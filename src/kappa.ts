@@ -21,6 +21,22 @@ export interface KappaResult {
   interpretation: string;
 }
 
+/**
+ * A coefficient computed over no comparable items. Not a band: it marks the
+ * absence of a measurement, so a degenerate panel does not read as "poor"
+ * (which sounds like a finding).
+ */
+export const UNDEFINED = "undefined (no comparable items)";
+
+/**
+ * The other degenerate case, and a different one: plenty of items, but every
+ * rating in a single category, so chance agreement is total and the
+ * coefficient is 0/0. Kept distinct because the two call for different fixes:
+ * one is a coverage problem, the other is a panel of raters that never
+ * discriminated.
+ */
+export const UNDEFINED_NO_VARIANCE = "undefined (all ratings in one category)";
+
 export function interpretKappa(k: number): string {
   if (k < 0.2) return "poor";
   if (k < 0.4) return "fair";
@@ -53,7 +69,9 @@ export function cohensKappa(
     matrix.get(la)!.set(lb, matrix.get(la)!.get(lb)! + 1);
     n += 1;
   }
-  if (n === 0) return { n: 0, agreement: 0, kappa: 0, interpretation: interpretKappa(0) };
+  // No shared items. Not "poor" agreement, which reads as a finding; the two
+  // raters were never compared.
+  if (n === 0) return { n: 0, agreement: 0, kappa: 0, interpretation: UNDEFINED };
 
   let agreed = 0;
   for (const l of labels) agreed += matrix.get(l)!.get(l)!;
@@ -70,7 +88,13 @@ export function cohensKappa(
     pE += (rowTotal / n) * (colTotal / n);
   }
 
-  const kappa = pE === 1 ? 1 : (pO - pE) / (1 - pE);
+  // pE === 1 means every rating fell in one category, so chance agreement is
+  // total and kappa is 0/0. Reporting 1 "near perfect" is the single worst
+  // thing this module can do: two raters who both say TP to everything are the
+  // textbook case kappa exists to catch, and 1.0 clears any --fail-under.
+  // No variance is not perfect agreement.
+  if (pE >= 1) return { n, agreement: pO, kappa: 0, interpretation: UNDEFINED_NO_VARIANCE };
+  const kappa = (pO - pE) / (1 - pE);
   return { n, agreement: pO, kappa, interpretation: interpretKappa(kappa) };
 }
 
@@ -136,7 +160,12 @@ export function fleissKappa(
     const pj = categoryTotals[j]! / totalAssignments;
     pE += pj * pj;
   }
-  const value = pE >= 1 ? 1 : (pBar - pE) / (1 - pE);
+  // As in cohensKappa: one category everywhere means 0/0, not 1. A panel of
+  // rubber stamps scored "near perfect" and cleared --fail-under 0.9.
+  if (pE >= 1) {
+    return { n: usedItems, raters: raters.length, value: 0, interpretation: UNDEFINED_NO_VARIANCE };
+  }
+  const value = (pBar - pE) / (1 - pE);
   return { n: usedItems, raters: raters.length, value, interpretation: interpretKappa(value) };
 }
 
@@ -195,6 +224,13 @@ export function krippendorffAlpha(
       deSum += nC[c]! * nC[k]!;
     }
   }
-  const value = deSum === 0 ? 1 : 1 - (n - 1) * (doSum / deSum);
+  // Expected disagreement is zero because only one category appears. The
+  // reference `krippendorff` package raises here ("There has to be more than
+  // one value in the domain") rather than returning 1, which is the same
+  // judgement reached a different way.
+  if (deSum === 0) {
+    return { n: usedItems, raters: raters.length, value: 0, interpretation: UNDEFINED_NO_VARIANCE };
+  }
+  const value = 1 - (n - 1) * (doSum / deSum);
   return { n: usedItems, raters: raters.length, value, interpretation: interpretKappa(value) };
 }

@@ -177,8 +177,21 @@ function main(): void {
   // Gate last, so a failing run still prints everything needed to diagnose it.
   if (failUnder !== undefined) {
     const short: string[] = [];
-    if (fk.value < failUnder) short.push(`Fleiss' kappa ${fk.value.toFixed(3)} < ${failUnder.toFixed(3)}`);
-    if (ka.value < failUnder) short.push(`Krippendorff's alpha ${ka.value.toFixed(3)} < ${failUnder.toFixed(3)}`);
+    // Check the interpretation, not just the value. Both degenerate branches in
+    // kappa.ts return 0, which is the right value and is not a measurement, so a
+    // gate reading only `.value` passed `--fail-under=0` on a panel the report
+    // itself calls undefined. An undefined coefficient meets no threshold.
+    const undefinedCoefficient =
+      fk.interpretation.startsWith("undefined") || ka.interpretation.startsWith("undefined");
+    if (undefinedCoefficient) {
+      short.push(
+        "agreement is undefined (no comparable items, or every rating in one category), " +
+          "so no threshold can be met",
+      );
+    } else {
+      if (fk.value < failUnder) short.push(`Fleiss' kappa ${fk.value.toFixed(3)} < ${failUnder.toFixed(3)}`);
+      if (ka.value < failUnder) short.push(`Krippendorff's alpha ${ka.value.toFixed(3)} < ${failUnder.toFixed(3)}`);
+    }
     console.log("\n=== Gate ===");
     if (short.length === 0) {
       console.log(`PASS  both coefficients are at or above ${failUnder.toFixed(3)}`);
