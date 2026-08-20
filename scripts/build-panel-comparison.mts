@@ -50,8 +50,18 @@ for (const k of raterKeys) labels[k] = loadLabels(resolve(dir, `${k}.jsonl`));
 const raters: Record<string, { name: string }> = {};
 for (const k of raterKeys) raters[k] = { name: k };
 
-// Pairwise kappa (redundancy signal). Rater keys must not contain '_': the
-// reliability tool splits the pair key on it.
+// Pairwise kappa (redundancy signal). The pair key is `a_b`, so a rater name
+// containing '_' makes the key ambiguous and the reliability tool silently
+// drops the pair (it splits on the first '_', gets a half-name, fails its
+// lookup guard, and moves on). That was a comment; now it is a check.
+const ambiguous = raterKeys.filter((k) => k.includes("_"));
+if (ambiguous.length > 0) {
+  console.error(
+    `build-panel-comparison: rater names must not contain '_' (the pair key is ` +
+      `"a_b" and would be ambiguous): ${ambiguous.join(", ")}. Rename the .jsonl files.`,
+  );
+  process.exit(2);
+}
 const pairwiseKappa: Record<string, { kappa: number; observedAgreement: number }> = {};
 for (let i = 0; i < raterKeys.length; i += 1) {
   for (let j = i + 1; j < raterKeys.length; j += 1) {

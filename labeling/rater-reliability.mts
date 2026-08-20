@@ -168,12 +168,38 @@ async function main(): Promise<void> {
   const redundancyByRater: Record<string, Array<{ other: string; kappa: number }>> = {};
   for (const k of raterKeys) redundancyByRater[k] = [];
   const redundantPairs: Array<{ a: string; b: string; kappa: number; agreement: number | null }> = [];
+  // Resolve `a_b` against the rater list rather than splitting blindly. A name
+  // containing '_' used to yield a half-name ("gpt_5_claude" -> "gpt"), fail the
+  // lookup guard below, and drop the pair with no warning, shrinking the
+  // redundancy basis and quietly shifting the KEEP/DROP calls.
+  const splitPair = (key: string): [string, string] | null => {
+    for (let i = key.indexOf("_"); i !== -1; i = key.indexOf("_", i + 1)) {
+      const left = key.slice(0, i);
+      const right = key.slice(i + 1);
+      if (raterKeys.includes(left) && raterKeys.includes(right)) return [left, right];
+    }
+    return null;
+  };
+  const unresolved: string[] = [];
   for (const [pairKey, rep] of Object.entries(pairwise)) {
-    const [a, b] = pairKey.split("_");
+    const parts = splitPair(pairKey);
+    if (!parts) {
+      unresolved.push(pairKey);
+      continue;
+    }
+    const [a, b] = parts;
     const kappa = rep?.kappa ?? 0;
     if (a && redundancyByRater[a]) redundancyByRater[a]!.push({ other: b!, kappa });
     if (b && redundancyByRater[b]) redundancyByRater[b]!.push({ other: a!, kappa });
     if (kappa >= args.redundantKappa) redundantPairs.push({ a: a!, b: b!, kappa, agreement: rep?.observedAgreement ?? null });
+  }
+  if (unresolved.length > 0) {
+    // Loud, not silent. A dropped pair changes every recommendation below it.
+    console.error(
+      `rater-reliability: could not match ${unresolved.length} pair ` +
+        `${unresolved.length === 1 ? "key" : "keys"} to the rater list: ` +
+        `${unresolved.join(", ")}. The redundancy basis is incomplete.`,
+    );
   }
   for (const k of raterKeys) {
     const ks = redundancyByRater[k]!.map((x) => x.kappa);

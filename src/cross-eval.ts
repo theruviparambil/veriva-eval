@@ -8,9 +8,12 @@
  *   out/<timestamp>/results.jsonl   one row per case
  *   out/<timestamp>/summary.json    aggregate stats
  *
- * Exits non-zero when the aggregate pass-rate is below `--min-pass-rate`
- * (default 0.95). That makes the harness a CI gate: wire it into a workflow on a
- * high-stakes surface and a regression fails the build like a unit test.
+ * Exits non-zero when judge ACCURACY falls below `--min-pass-rate` (default
+ * 0.95). Accuracy means each case's verdict matched its `expectedPass`, i.e.
+ * the judge was RIGHT, not that the panel passed. Cases with no `expectedPass`
+ * fall back to the raw pass rate. That makes the harness a CI gate: wire it into
+ * a workflow on a high-stakes surface and a regression fails the build like a
+ * unit test.
  *
  * Usage:
  *   npm run eval                                  # default fixture
@@ -36,6 +39,16 @@ interface FixtureCase {
   output: unknown;
   criteria: string;
   context?: string;
+  /**
+   * What the RIGHT verdict is for this case.
+   *
+   * Without it the gate scores "how many cases did the panel pass", which is
+   * not a quality signal: this fixture deliberately contains an answer that
+   * should fail, so the ceiling was 2 of 3 against a default 0.95 bar. It also
+   * pointed the wrong way, since the panel starting to pass the hedging case
+   * would have raised the rate and read as an improvement.
+   */
+  expectedPass?: boolean;
 }
 
 interface Args {
@@ -85,6 +98,7 @@ async function loadFixture(path: string): Promise<FixtureCase[]> {
       output: c.output,
       criteria: c.criteria,
       ...(typeof c.label === "string" ? { label: c.label } : {}),
+      ...(typeof c.expectedPass === "boolean" ? { expectedPass: c.expectedPass } : {}),
       ...(typeof c.context === "string" ? { context: c.context } : {}),
     };
   });
@@ -129,11 +143,17 @@ async function main(): Promise<void> {
         const agg = aggregateJudgements(judgements, args.threshold, args.requiredCount);
         console.log(
           `  [${agg.passed ? "PASS" : "FAIL"}] ${c.id}${c.label ? ` (${c.label})` : ""}  ` +
-            `mean=${agg.meanScore?.toFixed(2) ?? "n/a"}  passing=${agg.passingCount}/${agg.requiredCount}`,
+            `mean=${agg.meanScore?.toFixed(2) ?? "n/a"}  passing=${agg.passingCount}/${agg.requiredCount}` +
+            (typeof c.expectedPass === "boolean"
+              ? agg.passed === c.expectedPass
+                ? "  correct"
+                : `  WRONG (expected ${c.expectedPass ? "PASS" : "FAIL"})`
+              : ""),
         );
         return {
           id: c.id,
           label: c.label,
+          expectedPass: c.expectedPass,
           passed: agg.passed,
           meanScore: agg.meanScore,
           passingCount: agg.passingCount,
@@ -154,6 +174,19 @@ async function main(): Promise<void> {
 
   const passedCount = results.filter((r) => r.passed).length;
   const passRate = passedCount / results.length;
+
+  // Grade the judge, not the fixture. `passRate` answers "how many cases did the
+  // panel pass", which is not a quality signal: this fixture deliberately
+  // contains an answer that SHOULD fail, so the ceiling was 2/3 and the default
+  // 0.95 bar could never be met. Worse, if the panel started passing the hedging
+  // case the rate would rise and the gate would read that as an improvement.
+  //
+  // `expectedPass` says what the right verdict is. Accuracy against it is what
+  // gets gated. Cases without it are not scored either way.
+  const graded = results.filter((r) => typeof r.expectedPass === "boolean");
+  const correctCount = graded.filter((r) => r.passed === r.expectedPass).length;
+  const accuracy = graded.length > 0 ? correctCount / graded.length : null;
+
   const summary = {
     startedAt,
     finishedAt: new Date().toISOString(),
@@ -162,8 +195,11 @@ async function main(): Promise<void> {
     passedCount,
     failedCount: results.length - passedCount,
     passRate,
+    gradedCount: graded.length,
+    correctCount,
+    accuracy,
     minPassRate: args.minPassRate,
-    meetsBar: passRate >= args.minPassRate,
+    meetsBar: accuracy === null ? passRate >= args.minPassRate : accuracy >= args.minPassRate,
     threshold: args.threshold,
     requiredCount: args.requiredCount,
   };
@@ -177,12 +213,23 @@ async function main(): Promise<void> {
   console.log(`  total:     ${summary.totalCases}`);
   console.log(`  passed:    ${summary.passedCount}`);
   console.log(`  failed:    ${summary.failedCount}`);
-  console.log(`  pass rate: ${(summary.passRate * 100).toFixed(1)}%`);
+  console.log(`  pass rate: ${(summary.passRate * 100).toFixed(1)}%  (how many cases the panel passed)`);
+  if (accuracy !== null) {
+    console.log(
+      `  accuracy:  ${(accuracy * 100).toFixed(1)}%  ` +
+        `(${correctCount}/${graded.length} verdicts matched expectedPass)  <- gated on this`,
+    );
+  }
   console.log(`  min bar:   ${(summary.minPassRate * 100).toFixed(1)}%`);
   console.log(`  output:    ${args.outDir}`);
 
   if (!summary.meetsBar) {
-    console.error(`\ncross-eval: pass rate ${(passRate * 100).toFixed(1)}% < min bar ${(args.minPassRate * 100).toFixed(1)}%, failing build`);
+    const measured = accuracy === null ? passRate : accuracy;
+    const what = accuracy === null ? "pass rate" : "accuracy";
+    console.error(
+      `\ncross-eval: ${what} ${(measured * 100).toFixed(1)}% < min bar ` +
+        `${(args.minPassRate * 100).toFixed(1)}%, failing build`,
+    );
     process.exit(1);
   }
 }
