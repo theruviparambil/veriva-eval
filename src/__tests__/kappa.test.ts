@@ -7,6 +7,7 @@ import {
   interpretKappa,
   krippendorffAlpha,
 } from "../kappa.js";
+import { DECIDED_LABELS, LABELS } from "../types.js";
 
 const TWO = ["TP", "FP"] as const;
 
@@ -211,5 +212,36 @@ describe("no comparable items is not a measurement either", () => {
     for (const got of [fleissKappa(panel, LABELS), krippendorffAlpha(panel, LABELS)]) {
       expect(got.interpretation.startsWith("undefined")).toBe(true);
     }
+  });
+});
+
+describe("abstention is not agreement", () => {
+  // NEEDS_INVESTIGATION means the rater could not decide. Two raters who both
+  // abstain have not agreed about anything, but putting NI in the label set
+  // scored them as if they had. On the real panel that was 90 of 233 agreeing
+  // rater-pairs, and it moved Fleiss from -0.038 to 0.135.
+  const decided = DECIDED_LABELS as unknown as string[];
+  const all = LABELS as unknown as string[];
+
+  it("two raters that both abstain everywhere are not comparable", () => {
+    const a = new Map([["f1", "NEEDS_INVESTIGATION"], ["f2", "NEEDS_INVESTIGATION"]]);
+    const b = new Map(a);
+    expect(cohensKappa(a, b, decided).n).toBe(0);
+    expect(cohensKappa(a, b, decided).interpretation).toBe(UNDEFINED);
+    // With NI as a category they look like perfect agreement.
+    expect(cohensKappa(a, b, all).n).toBe(2);
+  });
+
+  it("abstention does not inflate a real disagreement", () => {
+    const a = new Map([["f1", "TP"], ["f2", "NEEDS_INVESTIGATION"], ["f3", "NEEDS_INVESTIGATION"]]);
+    const b = new Map([["f1", "FP"], ["f2", "NEEDS_INVESTIGATION"], ["f3", "NEEDS_INVESTIGATION"]]);
+    // They disagree on the one finding either of them decided.
+    expect(cohensKappa(a, b, decided).n).toBe(1);
+    // Counting NI as agreement turns 1 disagreement into 2 agreements.
+    expect(cohensKappa(a, b, all).agreement).toBeCloseTo(2 / 3, 6);
+  });
+
+  it("DECIDED_LABELS is LABELS without the abstention", () => {
+    expect(decided).toEqual(all.filter((l) => l !== "NEEDS_INVESTIGATION"));
   });
 });

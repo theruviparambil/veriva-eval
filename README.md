@@ -63,9 +63,27 @@ gemini      100% (15/15)              100% (15/15)
 gpt         67% (10/15)               100% (10/10)
 grok        13% (2/15)                100% (2/2)
 ...
-Fleiss' kappa:        0.135 (poor)
-Krippendorff's alpha: 0.141 (poor)
+Krippendorff's alpha: 0.046 (poor)  ·  20 findings, 7 raters
+Fleiss' kappa:       -0.038 (poor)
 ```
+
+**NEEDS_INVESTIGATION is an abstention, and is no longer scored as agreement.**
+Two raters who both decline to decide have not agreed about anything. Earlier
+versions of this table put NI in the label set, which published Fleiss 0.135 /
+alpha 0.141 — and **90 of the 233 agreeing rater-pairs behind those numbers
+(38.6%) were both raters saying "I cannot tell."** On the question the panel
+exists to answer, agreement is at or below chance.
+
+Alpha leads because it is built for missing data; Fleiss is reported for
+continuity and is not designed for uneven coverage. The replay prints both
+conventions and the NI share, so the difference is visible rather than argued.
+
+One consequence worth seeing: once NI is an abstention, pairs are only
+comparable on findings *both* raters decided, and grok abstains on 20 of 23. It
+shares two decided findings with deepseek and they happen to match. That is a
+Cohen's kappa of 1.000 that means nothing, so pairs below eight shared decided
+findings are excluded from the redundancy means and listed with their counts
+instead. grok reports `n/a`, which is the honest answer.
 
 Real models, real disagreement. Recall separates them cleanly: Gemini catches
 every true positive, Grok catches two of fifteen.

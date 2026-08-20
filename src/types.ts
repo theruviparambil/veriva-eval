@@ -8,6 +8,21 @@ import { z } from "zod";
 //   OUT_OF_SCOPE         = valid observation, but outside what we grade
 
 export const LABELS = ["TP", "FP", "NEEDS_INVESTIGATION", "OUT_OF_SCOPE"] as const;
+
+/**
+ * The label set used for agreement statistics: everything except the abstention.
+ *
+ * NEEDS_INVESTIGATION means the rater could not decide from the evidence. It is
+ * not a verdict, so two raters who both abstain have not agreed about anything
+ * and must not be scored as if they had. Passing this set to the coefficients
+ * makes an NI vote *missing* for that rater on that item, which is the
+ * treatment Krippendorff's alpha is designed for.
+ *
+ * It matters more than it sounds: on the real panel, 90 of the 233 agreeing
+ * rater-pairs (38.6%) are both raters saying "I cannot tell". Counting those as
+ * agreement is what moved Fleiss from -0.038 to 0.135.
+ */
+export const DECIDED_LABELS = ["TP", "FP", "OUT_OF_SCOPE"] as const;
 export type Label = (typeof LABELS)[number];
 
 // ─── Corpus shape (a set of real PRs to replay a reviewer against) ──────────

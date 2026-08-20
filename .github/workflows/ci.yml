@@ -57,15 +57,16 @@ jobs:
         run: npm run replay:real
 
       # Exercise the gate this project exists to provide. The real panel sits at
-      # Fleiss 0.135 / Krippendorff 0.141, so 0.1 must pass and 0.6 must fail.
+      # Fleiss -0.038 / Krippendorff 0.046 with NI as an abstention, so -0.1 must
+      # pass and 0.6 must fail.
       # A gate that cannot fail is not a gate.
       - name: Gate passes below the panel's agreement
-        run: npm run replay:real -- --fail-under=0.1
+        run: npm run replay:real -- --fail-under=-0.1
 
       - name: Gate fails above the panel's agreement
         run: |
           if npm run replay:real -- --fail-under=0.6; then
-            echo "::error::--fail-under=0.6 should have failed on a 0.135 panel"
+            echo "::error::--fail-under=0.6 should have failed on a 0.046 panel"
             exit 1
           fi
 

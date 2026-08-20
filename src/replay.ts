@@ -29,7 +29,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, resolve, basename } from "node:path";
 import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { cohensKappa, fleissKappa, krippendorffAlpha, interpretKappa } from "./kappa.js";
-import { LABELS, type Label } from "./types.js";
+import { LABELS, type Label, DECIDED_LABELS } from "./types.js";
 
 const DEFAULT_DIR = resolve(dirname(fileURLToPath(import.meta.url)), "../data/sample/panel");
 
@@ -207,31 +207,108 @@ function main(): void {
   // Panel-level agreement: Fleiss' kappa + Krippendorff's alpha, the recognized
   // statistics for more than two raters (averaging pairwise Cohen's kappa is not).
   const panel = raters.map((r) => labelsByRater.get(r)!);
-  const fk = fleissKappa(panel, LABELS as readonly Label[]);
-  const ka = krippendorffAlpha(panel, LABELS as readonly Label[]);
+  const fk = fleissKappa(panel, DECIDED_LABELS as readonly Label[]);
+  const ka = krippendorffAlpha(panel, DECIDED_LABELS as readonly Label[]);
   console.log("\n=== Panel agreement (all raters) ===");
-  console.log(`Fleiss' kappa:        ${fk.value.toFixed(3)} (${fk.interpretation})  ·  ${fk.n} findings, ${fk.raters} raters`);
-  console.log(`Krippendorff's alpha: ${ka.value.toFixed(3)} (${ka.interpretation})`);
+  console.log(
+    `Krippendorff's alpha: ${ka.value.toFixed(3)} (${ka.interpretation})  ·  ` +
+      `${ka.n} findings, ${ka.raters} raters`,
+  );
+  console.log(`Fleiss' kappa:        ${fk.value.toFixed(3)} (${fk.interpretation})`);
+  console.log(
+    "\nNEEDS_INVESTIGATION is treated as an abstention, not a category, so two\n" +
+      "raters who both decline to decide are not scored as agreeing. Alpha leads\n" +
+      "because it is built for missing data; Fleiss is reported for continuity and\n" +
+      "is not designed for uneven coverage.",
+  );
+
+  // The same panel with NI counted as a label, which is what earlier versions
+  // published. Printed because the difference IS the finding: most of the
+  // apparent agreement was mutual uncertainty, not agreement about whether a
+  // finding is real.
+  const withNi = raters.map((r) => labelsByRater.get(r)!);
+  const fkCat = fleissKappa(withNi, LABELS as readonly Label[]);
+  const kaCat = krippendorffAlpha(withNi, LABELS as readonly Label[]);
+  let agreeingPairs = 0;
+  let niPairs = 0;
+  for (let i = 0; i < raters.length; i += 1) {
+    for (let j = i + 1; j < raters.length; j += 1) {
+      const la = labelsByRater.get(raters[i]!)!;
+      const lb = labelsByRater.get(raters[j]!)!;
+      for (const [id, a] of la) {
+        const b = lb.get(id);
+        if (b !== undefined && a === b) {
+          agreeingPairs += 1;
+          if (a === "NEEDS_INVESTIGATION") niPairs += 1;
+        }
+      }
+    }
+  }
+  const niShare = agreeingPairs > 0 ? (100 * niPairs) / agreeingPairs : 0;
+  console.log(
+    `\nCounting NI as a label instead: Fleiss ${fkCat.value.toFixed(3)}, ` +
+      `alpha ${kaCat.value.toFixed(3)} over ${fkCat.n} findings.\n` +
+      `That is the higher number, and ${niShare.toFixed(1)}% of the agreeing rater-pairs ` +
+      `behind it (${niPairs} of ${agreeingPairs})\nare both raters saying "I cannot tell". ` +
+      "On the question the panel exists to answer, agreement is at or below chance.",
+  );
 
   // Per-rater redundancy: mean pairwise Cohen's kappa is not a panel statistic,
   // but it's a useful "agrees with everyone" view. A high value flags a rater
   // that adds little independent signal.
-  console.log("\n=== Rater redundancy (mean pairwise Cohen's kappa) ===");
+  // Once NI is an abstention, a pair is only comparable on the findings BOTH
+  // raters actually decided, and that count varies a lot. grok abstains on 20
+  // of 23, so grok/deepseek shares 2 decided findings and they happen to match:
+  // a kappa of 1.000 that means nothing. Pairs below the floor are excluded
+  // from the mean and reported separately rather than silently averaged in.
+  const MIN_PAIR_FINDINGS = 8;
+  console.log("\n=== Rater redundancy (mean pairwise Cohen's kappa, decided findings) ===");
   const kappaByRater = new Map<string, number[]>();
-  for (const r of raters) kappaByRater.set(r, []);
+  const coverageByRater = new Map<string, number[]>();
+  const thin: string[] = [];
+  for (const r of raters) {
+    kappaByRater.set(r, []);
+    coverageByRater.set(r, []);
+  }
   for (let i = 0; i < raters.length; i += 1) {
     for (let j = i + 1; j < raters.length; j += 1) {
       const a = raters[i]!;
       const b = raters[j]!;
-      const k = cohensKappa(labelsByRater.get(a)!, labelsByRater.get(b)!, LABELS as readonly Label[]);
+      const k = cohensKappa(
+        labelsByRater.get(a)!,
+        labelsByRater.get(b)!,
+        DECIDED_LABELS as readonly Label[],
+      );
+      if (k.n < MIN_PAIR_FINDINGS) {
+        thin.push(`${a}/${b} (${k.n})`);
+        continue;
+      }
       kappaByRater.get(a)!.push(k.kappa);
       kappaByRater.get(b)!.push(k.kappa);
+      coverageByRater.get(a)!.push(k.n);
+      coverageByRater.get(b)!.push(k.n);
     }
   }
   for (const r of raters) {
     const ks = kappaByRater.get(r)!;
-    const mean = ks.length ? ks.reduce((a, b) => a + b, 0) / ks.length : 0;
-    console.log(`${pad(r, 12)}${mean.toFixed(3)} (${interpretKappa(mean)})`);
+    const ns = coverageByRater.get(r)!;
+    if (ks.length === 0) {
+      console.log(`${pad(r, 12)}n/a  (no pair shares ${MIN_PAIR_FINDINGS}+ decided findings)`);
+      continue;
+    }
+    const mean = ks.reduce((a, b) => a + b, 0) / ks.length;
+    const meanN = Math.round(ns.reduce((a, b) => a + b, 0) / ns.length);
+    console.log(
+      `${pad(r, 12)}${mean.toFixed(3)} (${interpretKappa(mean)})  ·  ` +
+        `${ks.length} comparable ${ks.length === 1 ? "pair" : "pairs"}, ~${meanN} findings each`,
+    );
+  }
+  if (thin.length > 0) {
+    console.log(
+      `\nExcluded, fewer than ${MIN_PAIR_FINDINGS} decided findings in common: ` +
+        `${thin.join(", ")}.\nA coefficient from two or three items is not a measurement; ` +
+        "the count is the reason,\nnot the value.",
+    );
   }
 
   console.log(

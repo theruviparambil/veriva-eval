@@ -5,8 +5,10 @@
  * checked IS the process exit code. A unit test of the comparison would pass
  * while the CLI still exited 0, which is exactly the bug that matters.
  *
- * The real panel sits at Fleiss 0.135 / Krippendorff 0.141, so 0.14 falls
- * between them. That case is the reason the gate checks both coefficients.
+ * The real panel sits at Fleiss -0.038 / Krippendorff 0.046 once
+ * NEEDS_INVESTIGATION is treated as an abstention rather than a category, so
+ * 0.04 falls between them. That case is the reason the gate checks both
+ * coefficients.
  */
 import { describe, it, expect } from "vitest";
 import { spawnSync } from "node:child_process";
@@ -35,19 +37,19 @@ describe("replay --fail-under", () => {
   it("exits 1 and names both coefficients when the panel falls short", () => {
     const { code, stdout } = replay("--fail-under=0.6");
     expect(code).toBe(1);
-    expect(stdout).toContain("FAIL  Fleiss' kappa 0.135 < 0.600");
-    expect(stdout).toContain("FAIL  Krippendorff's alpha 0.141 < 0.600");
+    expect(stdout).toContain("FAIL  Fleiss' kappa -0.038 < 0.600");
+    expect(stdout).toContain("FAIL  Krippendorff's alpha 0.046 < 0.600");
   });
 
   it("exits 0 when both coefficients clear the threshold", () => {
-    const { code, stdout } = replay("--fail-under=0.1");
+    const { code, stdout } = replay("--fail-under=-0.1");
     expect(code).toBe(0);
     expect(stdout).toContain("PASS");
   });
 
   it("fails when only one coefficient falls short", () => {
-    // Fleiss 0.135 misses 0.14; Krippendorff 0.141 clears it.
-    const { code, stdout } = replay("--fail-under=0.14");
+    // Fleiss -0.038 misses 0.04; Krippendorff 0.046 clears it.
+    const { code, stdout } = replay("--fail-under=0.04");
     expect(code).toBe(1);
     expect(stdout).toContain("FAIL  Fleiss' kappa");
     expect(stdout).not.toContain("FAIL  Krippendorff");
