@@ -1,6 +1,6 @@
 # veriva-eval
 
-![Tests](https://img.shields.io/badge/tests-75-brightgreen)
+![Tests](https://img.shields.io/badge/tests-80-brightgreen)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)
 ![Reproducible](https://img.shields.io/badge/real%20run-reproducible%20offline-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
@@ -59,13 +59,13 @@ your own export with `--dir=path/to/panel`.
 On the synthetic panel you'll see per-model recall/precision, then panel agreement:
 
 ```
-rater       recall (caught real TP)   precision (TP calls correct)
-model-a     100% (5/5)                63% (5/8)
+rater       recall (caught real TP)   precision (on decided)
+model-a     100% (5/5)                71% (5/7)
 model-b     40% (2/5)                 100% (2/2)
 model-c     80% (4/5)                 100% (4/4)
 
-Fleiss' kappa:        -0.018 (poor)
-Krippendorff's alpha:  0.024 (poor)
+Krippendorff's alpha: -0.046 (poor)  ·  7 findings, 3 raters
+Fleiss' kappa:        -0.187 (poor)
 ```
 
 `model-a` catches every true positive but over-calls; `model-b` fires rarely but
