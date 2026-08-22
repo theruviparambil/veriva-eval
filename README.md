@@ -1,5 +1,10 @@
 # veriva-eval
 
+![Tests](https://img.shields.io/badge/tests-75-brightgreen)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)
+![Reproducible](https://img.shields.io/badge/real%20run-reproducible%20offline-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-blue)
+
 An eval harness for LLM-as-judge systems. It validates the judge the way you'd
 validate a panel of human graders: with inter-rater agreement (Fleiss' κ and
 Krippendorff's α), not accuracy. Before you trust a model to grade AI-generated
@@ -12,6 +17,30 @@ over 23 findings from public-OSS pull requests, with `npm run replay:real`. The
 private corpus stays private, but you can reproduce the real panel's agreement
 numbers yourself, and a synthetic sample lets you see the machinery with zero
 setup. Self-contained, MIT, no cloud account required.
+
+**Start here:** [the finding](#the-result-worth-talking-about)
+· [quickstart, no key](#quickstart-no-key-needed)
+· [the real run](#the-real-run)
+· [why κ instead of accuracy](#why-κ-instead-of-accuracy)
+· [gating CI](#gating-ci)
+· [full write-up](docs/RESULTS.md)
+
+---
+
+## The result worth talking about
+
+It isn't a precision number: it's that the method catches results you already
+believed. An adversarial review by a *different* model (told to refute, not
+confirm) caught a train/serve skew in a calibration scorer: the trainer was
+learning from a feature the runtime serves as `null`, so the lab number could
+never reproduce in production. A single model grading its own work misses that; a
+second, independent model told to break it doesn't.
+
+The other half is honesty about measurement. A model graded against labels that
+correlate with it (cohesion) scores higher than the same model graded against
+independent truth (accuracy). The defensible claims are the controlled
+comparisons and the methodology, not a precision figure quoted out of context.
+See [`docs/RESULTS.md`](docs/RESULTS.md) for the full write-up.
 
 ## Quickstart (no key needed)
 
@@ -171,21 +200,6 @@ shape. `baseline` is one direct LLM call; `qodo` shells out to
 across both and the only variable left is the orchestration framework, which is
 what the benchmark isolates. Add your own tool by implementing the `Provider`
 interface in `src/providers/`.
-
-## The result worth talking about
-
-It isn't a precision number: it's that the method catches results you already
-believed. An adversarial review by a *different* model (told to refute, not
-confirm) caught a train/serve skew in a calibration scorer: the trainer was
-learning from a feature the runtime serves as `null`, so the lab number could
-never reproduce in production. A single model grading its own work misses that; a
-second, independent model told to break it doesn't.
-
-The other half is honesty about measurement. A model graded against labels that
-correlate with it (cohesion) scores higher than the same model graded against
-independent truth (accuracy). The defensible claims are the controlled
-comparisons and the methodology, not a precision figure quoted out of context.
-See [`docs/RESULTS.md`](docs/RESULTS.md) for the full write-up.
 
 ## How it fits together
 
