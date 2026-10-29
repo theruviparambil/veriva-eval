@@ -45,7 +45,7 @@ attack a result rather than confirm it.
 In the system this harness came from, an adversarial review by an independent
 model (told to refute, not agree) caught a **train/serve skew** in a calibration
 scorer: the trainer was learning from a feature the runtime serves as `null`, so
-the lab number could never be reproduced in production. A single model grading
+the lab number could never be reproduced at serving time. A single model grading
 its own work would not have caught it. A second, independent model told to break
 it did.
 

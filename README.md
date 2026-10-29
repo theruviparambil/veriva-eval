@@ -10,7 +10,7 @@ validate a panel of human graders: with inter-rater agreement (Fleiss' κ and
 Krippendorff's α), not accuracy. Before you trust a model to grade AI-generated
 code, you first prove the grader itself is reliable.
 
-Extracted from a production AI code-governance pipeline. This repo ships the
+Extracted from an AI code-governance pipeline. This repo ships the
 **methodology and tooling** (the judge, the κ validation, the rubric, the
 benchmark harness) plus a **redacted real run**: seven frontier models scored
 over 23 findings from public-OSS pull requests, with `npm run replay:real`. The
@@ -33,7 +33,7 @@ It isn't a precision number: it's that the method catches results you already
 believed. An adversarial review by a *different* model (told to refute, not
 confirm) caught a train/serve skew in a calibration scorer: the trainer was
 learning from a feature the runtime serves as `null`, so the lab number could
-never reproduce in production. A single model grading its own work misses that; a
+never reproduce at serving time. A single model grading its own work misses that; a
 second, independent model told to break it doesn't.
 
 The other half is honesty about measurement. A model graded against labels that
@@ -99,7 +99,7 @@ Fleiss' kappa:       -0.038 (poor)
 **NEEDS_INVESTIGATION is an abstention, and is no longer scored as agreement.**
 Two raters who both decline to decide have not agreed about anything. Earlier
 versions of this table put NI in the label set, which published Fleiss 0.135 /
-alpha 0.141 — and **90 of the 233 agreeing rater-pairs behind those numbers
+alpha 0.141, and **90 of the 233 agreeing rater-pairs behind those numbers
 (38.6%) were both raters saying "I cannot tell."** On the question the panel
 exists to answer, agreement is at or below chance.
 
@@ -178,7 +178,7 @@ npm run eval
 ```
 
 `eval` runs a small set of judge cases through a cross-model panel in parallel.
-Each model returns a 0–1 score with a rationale; the panel passes a case by
+Each model returns a 0-1 score with a rationale; the panel passes a case by
 quorum (default: ≥2 of 3 models score ≥0.8). It writes `results.jsonl` +
 `summary.json` and **exits non-zero if the pass-rate drops below a bar**, so you
 can wire it into CI and a prompt regression fails the build like a unit test.

@@ -1,7 +1,7 @@
 {
   "name": "veriva-eval",
   "version": "0.1.0",
-  "description": "Cross-model LLM-judge eval harness with Cohen's-kappa validation. Extracted from a production AI code-governance pipeline.",
+  "description": "Cross-model LLM-judge eval harness with Cohen's-kappa validation. Extracted from an AI code-governance pipeline.",
   "type": "module",
   "license": "MIT",
   "engines": {
